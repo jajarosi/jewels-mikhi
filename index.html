@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>תכשיט אישי</title>
+  <!-- add my logo -->
+  <link rel="icon" href="assets/icons/michael-bloch.png" type="image/png" />
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="main.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@1/web/uc-file-uploader-regular.min.css"/>
+  <script>
+  UPLOADCARE_PUBLIC_KEY = "95cd37e8a2e2b723d5fe"; 
+  </script>
+  <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
+</head>
+<body>
+  <header class="brand-header">
+    <div class="logo-title">
+      <!-- <h1 class="brand-name">Michael_Bloch</h1> -->
+      <img src="assets/icons/michael-bloch.png" alt="Logo" class="brand-logo" style="width: 375px; object-fit: contain;" />
+      <div class="brand-socials">
+        <a href="https://www.instagram.com/michael__bloch" target="_blank">
+          <img src="assets/icons/instagram-icon.png" alt="Instagram" style="width: 32px; height: 32px; object-fit: contain; cursor: pointer;" />
+        </a>
+        <!-- whatsapp link -->
+        <a href="https://wa.me/972522710675" target="_blank">
+          <img src="./assets/icons/whatsapp.png" alt="whatsapp" style="width: 32px; height: 32px; object-fit: contain; cursor: pointer;">
+        </a>
+      </div>
+
+    </div>
+    <!-- <p class="brand-slogan">Un formulaire élégant pour un événement inoubliable ✨</p> -->
+  </header>
+  <main class="main-content">
+    <div class="hero">
+      <div class="hero-text">
+        <h1>ברוכים הבאים לעולם יוקרה אישית</h1>
+        <p>אני מיכאל בלוך, שמח ונרגש לעצב איתכם את התכשיט הבא – פריט שהוא הרבה מעבר ליופי.</p>
+        <p>באתר מחכה לכם חוויה ייחודית של עיצוב אישי, דיוק אומנותי וסטנדרט בלתי מתפשר.</p>
+        <p>*תודה שבחרתם בי ללוות את הרגעים היקרים באמת.*</p>
+      </div>
+    </div>
+    <div class="form-container-wrapper">
+      <div id="user-summary" class="user-summary" style="display: none;">
+        <ul style="display: flex; justify-content: space-between;">
+            <li><strong>תכשיט: </strong> <span id="summary-jewel"></span></li>
+            <li><strong>סוג אבן: </strong> <span id="summary-gem"></span></li>
+            <li><strong>פריסה משולבת: </strong> <span id="summary-layout"></span></li>
+            <li><strong>מקור: </strong> <span id="summary-origin"></span></li>
+            <li><strong>אבן חן: </strong> <span id="summary-stone-type"></span></li>
+            <li><strong>צורה: </strong> <span id="summary-shape"></span></li>
+            <li><strong>קראט גודל:</strong> <span id="summary-stone-carat"></span></li>
+            <li><strong>צבע זהב:</strong> <span id="summary-color"></span></li>
+            <li><strong>קראט של זהב:</strong> <span id="summary-metal-carat"></span></li>
+            <li><strong>גודל צמיד:</strong> <span id="summary-bracelet-size"></span></li>
+            <li><strong>גודל טבעת:</strong> <span id="summary-ring-size"></span></li>
+            <li><strong>גודל שרשרת:</strong> <span id="summary-collier-size"></span></li>
+            <li><strong>סוג עגילים:</strong> <span id="summary-boucles-size"></span></li>
+        </ul>
+      </div>
+      <div class="container">
+        <h1> ? איך תרצו לעצב את התכשיט שלכם 💎</h1>
+        <!-- <div id="user-summary" class="user-summary" style="display: none;">
+          <ul style="display: flex; justify-content: space-between;">
+            <li><strong>תכשיט: </strong> <span id="summary-jewel"></span></li>
+            <li><strong>סוג אבן: </strong> <span id="summary-gem"></span></li>
+            <li><strong>פריסה משולבת: </strong> <span id="summary-layout"></span></li>
+            <li><strong>מקור: </strong> <span id="summary-origin"></span></li>
+            <li><strong>אבן חן: </strong> <span id="summary-stone-type"></span></li>
+            <li><strong>צורה: </strong> <span id="summary-shape"></span></li>
+            <li><strong>קראט גודל:</strong> <span id="summary-stone-carat"></span></li>
+            <li><strong>צבע זהב:</strong> <span id="summary-color"></span></li>
+            <li><strong>קראט של זהב:</strong> <span id="summary-metal-carat"></span></li>
+            <li><strong>גודל צמיד:</strong> <span id="summary-bracelet-size"></span></li>
+            <li><strong>גודל טבעת:</strong> <span id="summary-ring-size"></span></li>
+            <li><strong>גודל קוליה:</strong> <span id="summary-collier-size"></span></li>
+            <li><strong>סוג עגילים:</strong> <span id="summary-boucles-size"></span></li>
+          </ul>
+        </div> -->
+        
+        <!-- step 0 -->
+
+        <div class="step active" id="step0">
+          <div class="choices">
+            <label>
+              <input type="radio" name="personalised" value="custom" />
+              <h3>עיצוב אישי לפי קטגוריות </h3> 
+              <span>תהליך עיצוב מלא ומפורט – בחרו צורה, גודל, שיבוץ, צבע מתכת ועוד… עד שהתכשיט מושלם בדיוק כמו שדמיינתם.</span>
+            </label>
+            <label>
+              <input type="radio" name="personalised" value="upload" />
+              <h3>לפי תמונה אישית</h3>
+              <span>יש לכם השראה? שלחו לנו תמונה של תכשיט שחלמתם עליו – ואנחנו נעצב אותו במיוחד עבורכם, בדיוק לפי הרצון והחזון האישי שלכם.</span>
+            </label>
+            <label>
+              <input type="radio" name="personalised" value="model" />
+              <h3>מתוך הקולקציה שלנו </h3>
+              <span> עיצובים מוכנים, זמינים במלאי – כל מה שצריך זה לבחור. ראיתם תכשיט שאהבתם? הזמינו אותו כפי שהוא או עם התאמות קלות.</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- step 13 -->
+      
+        <div id="step13" class="step">
+          <h2>בחרו תמונה</h2>
+          <div class="note-double-click" style="text-align: center; font-size: 0.9em; color: #666; margin-bottom: 10px;">
+            🔍 לחצו פעמיים על התמונה כדי להגדיל אותה
+          </div>
+          <div class="carousel">
+            <button class="prev">‹</button>
+            <div class="carousel-track">
+              <img class="img_carousel" src="./assets/creations/quatre-b-b-ecrain.jpeg" alt="quatre-b-b-ecrain" data-name="quatre-b-b-ecrain.jpeg" />
+              <img class="img_carousel" src="./assets/creations/quatre-b-bl-ecrain.jpeg" alt="quatre-b-bl-ecrain.jpeg" data-name="quatre-b-bl-ecrain.jpeg2" />
+              <img class="img_carousel" src="./assets/creations/quatre-b-r-ecrain.jpeg" alt="quatre-b-r-ecrain" data-name="quatre-b-r-ecrain" />
+              <img class="img_carousel" src="./assets/creations/un-an-or-main.jpeg" alt="un-an-or-main" data-name="un-an-or-main.jpeg" />
+              <img class="img_carousel" src="./assets/creations/une-b-b-main.jpeg" alt="une-b-b-main" data-name="une-b-b-main.jpeg" />
+              <img class="img_carousel" src="./assets/creations/une-b-bl-maion.jpeg" alt="une-b-bl-maion" data-name="une-b-bl-maion.jpeg" />
+              <img class="img_carousel" src="./assets/creations/une-b-main.jpeg" alt="une-b-main" data-name="une-b-main.jpeg" />
+            </div>
+            <button class="next">›</button>
+          </div>
+          <p id="selected-name">לא נבחרה יצירה</p>
+          <button id="confirmImageBtn" style="display: none; margin-top: 10px;">
+            אשר את התמונה
+          </button>
+        </div>
+
+        <!-- step 12 -->
+
+        <div class="step" id="step12">
+            <h2>הוסף תמונה</h2>
+            <input
+              type="hidden"
+              role="uploadcare-uploader"
+              data-clearable
+              data-tabs="file camera"
+              id="uploadcareInput"
+            />
+            <p id="uploadStatus">📎 אין קובץ שנשלח</p>
+            <button id="confirmBtn" style="display: none; margin-top: 10px;">
+              אשר את התמונה
+            </button>
+        </div>
+
+        <!-- step 1 -->
+
+        <div class="step" id="step1">
+          <h2>איזה סוג תכשיט?</h2>
+          <div class="choices">
+            <label><input type="radio" name="jewel" value="טבעת" /> טבעת</label>
+            <label><input type="radio" name="jewel" value="צמיד" /> צמיד</label>
+            <label><input type="radio" name="jewel" value="שרשרת" /> שרשרת</label>
+            <label><input type="radio" name="jewel" value="עגילים" /> עגילים</label>
+          </div>
+        </div>
+
+        <!-- step 2 -->
+      
+        <div class="step" id="step2">
+          <h2> בחרו סוג אבן</h2>
+          <div class="choices">
+            <label><input type="radio" name="gem" value="יהלום" /> יהלום</label>
+            <label><input type="radio" name="gem" value="אבן-חן" /> אבן חן</label>
+            <label><input type="radio" name="gem" value="משולב" /> משולב משניהם</label>
+          </div>
+        </div>
+
+        <!-- step 3 -->
+      
+        <div class="step" id="step3">
+          <h2> סידור האבנים המשולבות</h2>
+          <div class="choices">
+            <label><input type="radio" name="layout" value="מסביב" /> מסביב</label>
+            <label><input type="radio" name="layout" value="חלופי" /> חלופי</label>
+          </div>
+        </div>
+
+        
+        <!-- step 4 -->
+        
+        <div class="step" id="step4">
+          <h2> בחרו אבן חן</h2>
+          <div class="shape-choices">
+            <label><input type="radio" name="precious_stone" value="אודם" /> <span>אודם</span><img src="./assets/precious_stone/rubis.jpg" alt=""></label>
+            <label><input type="radio" name="precious_stone" value="ספיר" /> <span>ספיר</span><img src="./assets/precious_stone/saphir.avif" alt=""></label>
+            <label><input type="radio" name="precious_stone" value="אֶזְמֶרָה" /> <span>אֶזְמֶרָה</span><img src="./assets/precious_stone/emeraude.avif" alt=""></label>
+            <label><input type="radio" name="precious_stone" value="טופז כחול" /> <span>טופז כחול</span><img src="./assets/precious_stone/topaze_bleu.avif" alt=""></label>
+            <label><input type="radio" name="precious_stone" value="טורמלין" /> <span>טורמלין</span><img src="./assets/precious_stone/tourmaline.jpg" alt=""></label>
+            <!-- <label><input type="radio" name="precious_stone" value="aigue_marine" /> <span>Aigue-marine</span></label> -->
+            <label><input type="radio" name="precious_stone" value="סיטרין" /> <span>סיטרין</span><img src="./assets/precious_stone/citrine.jpeg" alt=""></label>
+            <label><input type="radio" name="precious_stone" value="פנינים" /> <span>פנינים</span><img src="./assets/precious_stone/perles.avif" alt=""></label>
+            <label><input type="radio" name="precious_stone" value="אחר" /> <span>אחר</span></label>
+          </div>
+        </div>
+        
+        <!-- step 5 -->
+    
+      <div class="step" id="step5">
+        <h2> מקור האבנים</h2>
+        <div class="choices">
+          <label><input type="radio" name="origin" value="מעבדה" /> מעבדה</label>
+          <label><input type="radio" name="origin" value="טבעית" /> טבעית</label>
+        </div>
+      </div>
+
+        <!-- step 6 -->
+
+        <div class="step" id="step6">
+          <h2> צורת האבן</h2>
+          <div class="shape-choices">
+            <label><input type="radio" name="shape" value="אסשר" /> <span>אסשר</span> <img src="./assets/diamond_shape/asscher_new.webp" alt="" /></label>
+            <label><input type="radio" name="shape" value="קושן" /> <span>קושן</span> <img src="./assets/diamond_shape/cushion_new.webp" alt="" /></label>
+            <label><input type="radio" name="shape" value="אמרלד" /> <span>אמרלד</span> <img src="./assets/diamond_shape/emerald_new.webp" alt="" /></label>
+            <label><input type="radio" name="shape" value="לב" /> <span>לב</span> <img src="./assets/diamond_shape/heart_new.webp" alt="" /></label>
+            <label><input type="radio" name="shape" value="מרקיז" /> <span>מרקיז</span> <img src="./assets/diamond_shape/marquise_new.webp" alt="" /></label>
+            <label><input type="radio" name="shape" value="אובלי" /> <span>אובלי</span> <img src="./assets/diamond_shape/oval_new.webp" alt="" /></label>
+            <label><input type="radio" name="shape" value="אגס" /> <span>אגס</span> <img src="./assets/diamond_shape/pear_new.webp" alt="" /></label>
+            <label><input type="radio" name="shape" value="נסיכה" /> <span>נסיכה</span> <img src="./assets/diamond_shape/princess_new.webp" alt="" /></label>
+            <label><input type="radio" name="shape" value="עגול" /> <span>עגול</span> <img src="./assets/diamond_shape/round_new.webp" alt="" /></label>
+            <label><input type="radio" name="shape" value="אחר" /> <span>אחר</span></label>
+          </div>
+        </div>
+
+        <!-- step 7 -->
+
+        <div class="step" id="step7">
+          <h2> קראט האבן</h2> 
+          <div class="choices">
+            <label><input type="radio" name="carat" value="0.30" /> 0.30 קראט</label>
+            <label><input type="radio" name="carat" value="0.40" /> 0.40 קראט</label>
+            <label><input type="radio" name="carat" value="0.50" /> 0.50 קראט</label>
+            <label><input type="radio" name="carat" value="0.60" /> 0.60 קראט</label>
+            <label><input type="radio" name="carat" value="0.70" /> 0.70 קראט</label>
+            <label><input type="radio" name="carat" value="0.80" /> 0.80 קראט</label>
+            <label><input type="radio" name="carat" value="0.90" /> 0.90 קראט</label>
+            <label><input type="radio" name="carat" value="1" /> 1 קראט</label>
+            <label><input type="radio" name="carat" value="1.5" /> 1.5 קראט</label>
+            <label><input type="radio" name="carat" value="2" /> 2 קראט</label>
+            <label><input type="radio" name="carat" value="2.5" /> 2.5 קראט</label>
+            <label><input type="radio" name="carat" value="3" /> 3 קראט</label>
+            <label><input type="radio" name="carat" value="3.5" /> 3.5 קראט</label>
+            <label><input type="radio" name="carat" value="4" /> 4 קראט</label>
+            <label><input type="radio" name="carat" value="4.5" /> 4.5 קראט</label>
+            <label><input type="radio" name="carat" value="5" /> 5 קראט</label>
+            <label><input type="radio" name="carat" value="5.5" /> 5.5 קראט</label>
+            <label><input type="radio" name="carat" value="6" /> 6 קראט</label>
+            <label><input type="radio" name="carat" value="autre" /> אחר</label>
+          </div>
+        </div>
+
+        <!-- step 8 -->
+
+        <div class="step" id="step8">
+          <h2> צבע התכשיט</h2> 
+          <div class="choices">
+            <label><input type="radio" name="jewel-color" value="זהב" /> זהב</label>
+            <label><input type="radio" name="jewel-color" value="כסף" /> כסף</label>
+            <label><input type="radio" name="jewel-color" value="זהב-רוזה" /> זהב רוזה</label>
+          </div>
+        </div>
+
+        <div class="step" id="step9">
+          <h2> קראט המתכת</h2> 
+          <div class="choices">
+            <label><input type="radio" name="metal-carat" value="14K" /> 14K</label>
+            <label><input type="radio" name="metal-carat" value="18K" /> 18K</label>
+            <label><input type="radio" name="metal-carat" value="24K" /> 24K</label>
+          </div>
+        </div>
+
+        <!-- step 10 -->
+
+        <div class="step" id="step10">
+          <h2> גודל התכשיט</h2> 
+          <div class="choices">
+            <div id="ring-container" class="size-option">
+              <label for="ring-size">מידת הטבעת :</label>
+              <select id="ring-size" name="ring-size">
+                <option value="">בחר גודל</option>
+                <script>
+                  for (let i = 45; i <= 60; i++) {
+                    document.write('<option value="' + i + '">' + i + '</option>');
+                  }
+                </script>
+              </select>
+            </div>
+            <div id="bracelet-container" class="size-option">
+              <label for="bracelet-size">גודל הצמיד :</label>
+              <select id="bracelet-size" name="bracelet-size">
+                <option value="">בחר גודל</option>
+                <script>
+                  for (let i = 35; i <= 50; i += 5) {
+                    document.write('<option value="' + i + '">' + i + '</option>');
+                  }
+                </script>
+              </select>
+            </div>
+            <div id="collier-container" class="size-option">
+            <label for="collier-size">אורך שרשרת :</label>
+              <select id="collier-size" name="collier-size">
+                <option value="">בחר גודל</option>
+                <script>
+                  for (let i = 35; i <= 50; i += 5) {
+                    document.write('<option value="' + i + '">' + i + '</option>');
+                  }
+                </script>
+              </select>
+            </div>
+            <div id="boucles-container" class="size-option">
+              <label for="boucles-type">סוגי עגילים :</label>
+              <select id="boucles-type" name="boucles-type">
+                <option value="">בחר סוג</option>
+                <option value="לחיצה">לחיצה</option>
+                <option value="מתלה">מתלה</option>
+                <option value="אברדה">אברדה</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- step 11 -->
+
+        <div class="step" id="step11">
+            <form id="finalForm" onsubmit="submitForm(event)">
+              <h2> פרטי התקשרות</h2>
+              <input type="text" name="name" placeholder="שם" required />
+              <input type="email" name="email" placeholder="אימייל" required />
+              <input type="tel" name="phone" placeholder="טלפון" required />
+
+              <textarea name="comment" placeholder="הערותיך" rows="4"></textarea>
+              <button id="submitBtn" type="submit">שלח</button>
+              <div id="loadingMessage" class="hidden">... שליחה מתבצעת ...</div>
+            </form>
+            <div id="message" class="hidden">✅ תודה ! הבחירות שלך נשמרו.</div>
+        </div>
+
+        <div class="navigation-buttons">
+          <button id="previousBtn" onclick="previousStep()">קודם</button>
+          <button id="nextBtn" onclick="nextStep()">הבא</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+
+  <footer class="footer">
+    <p>&copy; 2023 Michael_Bloch. כל הזכויות שמורות.</p>
+  </footer>
+  <div id="imageModal" class="modal" onclick="closeImageModal(event)">
+    <img id="modalImage" class="modal-content" />
+  </div>
+</body>
+</html>
