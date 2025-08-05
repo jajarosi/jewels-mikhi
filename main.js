@@ -213,7 +213,7 @@ function submitForm(e) {
   data.append("phone", document.querySelector('input[name="phone"]')?.value || "");
   data.append("comment", document.querySelector('textarea[name="comment"]')?.value || "");
 
-  fetch('https://script.google.com/macros/s/AKfycbyzMAL6vmENzyU2ckRXCfRz9Khi0x6OUjHAACJyvKJDgQMo8A30ohJ3QEMfhlDjO0ti/exec', {
+  fetch('https://script.google.com/macros/s/AKfycbzFZOaj-A_7loh-wfz2Jq4Epbu6rKQaBNN5gQEWKf3RkAw0liCYCv7Xiz0yAOz7ldpM9g/exec', {
   method: 'POST',
   body: data,
   mode: "no-cors"
