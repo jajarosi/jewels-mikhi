@@ -15,6 +15,11 @@
   <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
 </head>
 <body>
+  <audio id="background-audio" loop autoplay muted>
+      <source src="./assets/musics/music.mp3" type="audio/mpeg">
+      <source src="./assets/musics/music.mp3" type="audio/ogg">
+      Votre navigateur ne supporte pas la balise audio.
+  </audio>
   <header class="brand-header">
     <div class="logo-title">
       <!-- <h1 class="brand-name">Michael_Bloch</h1> -->
@@ -26,6 +31,10 @@
         <!-- whatsapp link -->
         <a href="https://wa.me/972522710675" target="_blank">
           <img src="./assets/icons/whatsapp.png" alt="whatsapp" style="width: 32px; height: 32px; object-fit: contain; cursor: pointer;">
+        </a>
+        <!-- add tel link -->
+        <a href="tel:+972522710675" target="_blank" style="text-decoration: none; color: inherit;">
+           52-271-0675 972+
         </a>
       </div>
 
@@ -42,42 +51,14 @@
       </div>
     </div>
     <div class="form-container-wrapper">
-      <div id="user-summary" class="user-summary" style="display: none;">
-        <ul style="display: flex; justify-content: space-between;">
-            <li><strong>תכשיט: </strong> <span id="summary-jewel"></span></li>
-            <li><strong>סוג אבן: </strong> <span id="summary-gem"></span></li>
-            <li><strong>פריסה משולבת: </strong> <span id="summary-layout"></span></li>
-            <li><strong>מקור: </strong> <span id="summary-origin"></span></li>
-            <li><strong>אבן חן: </strong> <span id="summary-stone-type"></span></li>
-            <li><strong>צורה: </strong> <span id="summary-shape"></span></li>
-            <li><strong>קראט גודל:</strong> <span id="summary-stone-carat"></span></li>
-            <li><strong>צבע זהב:</strong> <span id="summary-color"></span></li>
-            <li><strong>קראט של זהב:</strong> <span id="summary-metal-carat"></span></li>
-            <li><strong>גודל צמיד:</strong> <span id="summary-bracelet-size"></span></li>
-            <li><strong>גודל טבעת:</strong> <span id="summary-ring-size"></span></li>
-            <li><strong>גודל שרשרת:</strong> <span id="summary-collier-size"></span></li>
-            <li><strong>סוג עגילים:</strong> <span id="summary-boucles-size"></span></li>
-        </ul>
-      </div>
+      
       <div class="container">
         <h1> איך תרצו לעצב את התכשיט שלכם ? 💎 </h1>
-        <!-- <div id="user-summary" class="user-summary" style="display: none;">
-          <ul style="display: flex; justify-content: space-between;">
-            <li><strong>תכשיט: </strong> <span id="summary-jewel"></span></li>
-            <li><strong>סוג אבן: </strong> <span id="summary-gem"></span></li>
-            <li><strong>פריסה משולבת: </strong> <span id="summary-layout"></span></li>
-            <li><strong>מקור: </strong> <span id="summary-origin"></span></li>
-            <li><strong>אבן חן: </strong> <span id="summary-stone-type"></span></li>
-            <li><strong>צורה: </strong> <span id="summary-shape"></span></li>
-            <li><strong>קראט גודל:</strong> <span id="summary-stone-carat"></span></li>
-            <li><strong>צבע זהב:</strong> <span id="summary-color"></span></li>
-            <li><strong>קראט של זהב:</strong> <span id="summary-metal-carat"></span></li>
-            <li><strong>גודל צמיד:</strong> <span id="summary-bracelet-size"></span></li>
-            <li><strong>גודל טבעת:</strong> <span id="summary-ring-size"></span></li>
-            <li><strong>גודל קוליה:</strong> <span id="summary-collier-size"></span></li>
-            <li><strong>סוג עגילים:</strong> <span id="summary-boucles-size"></span></li>
-          </ul>
-        </div> -->
+
+        <div class="navigation-buttons">
+          <button id="homeBtn" onclick="homePage()">דף הבית</button>
+          <!-- <button id="nextBtn" onclick="nextStep()">הבא</button> -->
+        </div>
         
         <!-- step 0 -->
 
@@ -112,6 +93,7 @@
             <button class="prev">‹</button>
             <div class="carousel-track">
               <img class="img_carousel" src="./assets/creations/quatre-b-b-ecrain.jpeg" alt="quatre-b-b-ecrain" data-name="quatre-b-b-ecrain.jpeg" />
+              <img class="img_carousel" src="./assets/creations/bague-entoure.jpeg" alt="bague-entoure" data-name="bague-entoure.jpeg"/>
               <img class="img_carousel" src="./assets/creations/quatre-b-bl-ecrain.jpeg" alt="quatre-b-bl-ecrain.jpeg" data-name="quatre-b-bl-ecrain.jpeg2" />
               <img class="img_carousel" src="./assets/creations/quatre-b-r-ecrain.jpeg" alt="quatre-b-r-ecrain" data-name="quatre-b-r-ecrain" />
               <img class="img_carousel" src="./assets/creations/un-an-or-main.jpeg" alt="un-an-or-main" data-name="un-an-or-main.jpeg" />
@@ -183,15 +165,102 @@
         <div class="step" id="step4">
           <h2> בחרו אבן חן</h2>
           <div class="shape-choices">
-            <label><input type="radio" name="precious_stone" value="אודם" /> <span>אודם</span><img src="./assets/precious_stone/rubis.jpg" alt=""></label>
-            <label><input type="radio" name="precious_stone" value="ספיר" /> <span>ספיר</span><img src="./assets/precious_stone/saphir.avif" alt=""></label>
-            <label><input type="radio" name="precious_stone" value="אֶזְמֶרָה" /> <span>אֶזְמֶרָה</span><img src="./assets/precious_stone/emeraude.avif" alt=""></label>
-            <label><input type="radio" name="precious_stone" value="טופז כחול" /> <span>טופז כחול</span><img src="./assets/precious_stone/topaze_bleu.avif" alt=""></label>
-            <label><input type="radio" name="precious_stone" value="טורמלין" /> <span>טורמלין</span><img src="./assets/precious_stone/tourmaline.jpg" alt=""></label>
-            <!-- <label><input type="radio" name="precious_stone" value="aigue_marine" /> <span>Aigue-marine</span></label> -->
-            <label><input type="radio" name="precious_stone" value="סיטרין" /> <span>סיטרין</span><img src="./assets/precious_stone/citrine.jpeg" alt=""></label>
-            <label><input type="radio" name="precious_stone" value="פנינים" /> <span>פנינים</span><img src="./assets/precious_stone/perles.avif" alt=""></label>
-            <label><input type="radio" name="precious_stone" value="אחר" /> <span>אחר</span></label>
+            <label class="stone-flip">
+              <input type="radio" name="precious_stone" value="רובי" />
+              <div class="flip-inner">
+                <div class="flip-front">
+                  <span>רובי</span>
+                  <img src="./assets/precious_stone/rubis.jpg" alt="רובי">
+                </div>
+                <div class="flip-back">
+                  <div class="stone-info-text"></div>
+                </div>
+              </div>
+            </label>
+            <label class="stone-flip">
+              <input type="radio" name="precious_stone" value="ספיר" />
+              <div class="flip-inner">
+                <div class="flip-front">
+                  <span>ספיר</span>
+                  <img src="./assets/precious_stone/saphir.avif" alt="ספיר">
+                </div>
+                <div class="flip-back">
+                  <div class="stone-info-text"></div>
+                </div>
+              </div>
+            </label>
+            <label class="stone-flip">
+              <input type="radio" name="precious_stone" value="אמרלד" />
+              <div class="flip-inner">
+                <div class="flip-front">
+                  <span>אמרלד</span>
+                  <img src="./assets/precious_stone/emeraude.avif" alt="אמרלד">
+                </div>
+                <div class="flip-back">
+                  <div class="stone-info-text"></div>
+                </div>
+              </div>
+            </label>
+            <label class="stone-flip">
+              <input type="radio" name="precious_stone" value="בלו-טופז" />
+              <div class="flip-inner">
+                <div class="flip-front">
+                  <span>בלו טופז</span>
+                  <img src="./assets/precious_stone/topaze_bleu.avif" alt="בלו טופז">
+                </div>
+                <div class="flip-back">
+                  <div class="stone-info-text"></div>
+                </div>
+              </div>
+            </label>
+            <label class="stone-flip">
+              <input type="radio" name="precious_stone" value="טורמלין" />
+              <div class="flip-inner">
+                <div class="flip-front">
+                  <span>טורמלין</span>
+                  <img src="./assets/precious_stone/tourmaline.jpg" alt="טורמלין">
+                </div>
+                <div class="flip-back">
+                  <div class="stone-info-text"></div>
+                </div>
+              </div>
+            </label>
+            <label class="stone-flip">
+              <input type="radio" name="precious_stone" value="ציטרין" />
+              <div class="flip-inner">
+                <div class="flip-front">
+                  <span>ציטרין</span>
+                  <img src="./assets/precious_stone/citrine.jpeg" alt="ציטרין">
+                </div>
+                <div class="flip-back">
+                  <div class="stone-info-text"></div>
+                </div>
+              </div>
+            </label>
+            <label class="stone-flip">
+              <input type="radio" name="precious_stone" value="פנינים" />
+              <div class="flip-inner">
+                <div class="flip-front">
+                  <span>פנינים</span>
+                  <img src="./assets/precious_stone/perles.avif" alt="פנינים">
+                </div>
+                <div class="flip-back">
+                  <div class="stone-info-text"></div>
+                </div>
+              </div>
+            </label>
+            <label class="stone-flip">
+              <input type="radio" name="precious_stone" value="אחר" id="precious_stone_other_radio" />
+              <div class="flip-inner">
+                <div class="flip-front">
+                  <span>אחר</span>
+                  <input type="text" id="precious_stone_other_input" name="precious_stone_other_input" placeholder="הכנס אבן חן" style="display:none; margin-top:8px; width:90px; font-size:1em;" autocomplete="off" />
+                </div>
+                <div class="flip-back">
+                  <div class="stone-info-text"></div>
+                </div>
+              </div>
+            </label>
           </div>
         </div>
         
@@ -201,7 +270,7 @@
         <h2> מקור האבנים</h2>
         <div class="choices">
           <label><input type="radio" name="origin" value="מעבדה" /> מעבדה</label>
-          <label><input type="radio" name="origin" value="טבעית" /> טבעית</label>
+          <label><input type="radio" name="origin" value="טבעי" /> טבעי</label>
         </div>
       </div>
 
@@ -210,16 +279,20 @@
         <div class="step" id="step6">
           <h2> צורת האבן</h2>
           <div class="shape-choices">
-            <label><input type="radio" name="shape" value="אסשר" /> <span>אסשר</span> <img src="./assets/diamond_shape/asscher_new.webp" alt="" /></label>
+            <label><input type="radio" name="shape" value="רדיאן" /> <span>רדיאן</span> <img src="./assets/diamond_shape/asscher_new.webp" alt="" /></label>
             <label><input type="radio" name="shape" value="קושן" /> <span>קושן</span> <img src="./assets/diamond_shape/cushion_new.webp" alt="" /></label>
             <label><input type="radio" name="shape" value="אמרלד" /> <span>אמרלד</span> <img src="./assets/diamond_shape/emerald_new.webp" alt="" /></label>
             <label><input type="radio" name="shape" value="לב" /> <span>לב</span> <img src="./assets/diamond_shape/heart_new.webp" alt="" /></label>
-            <label><input type="radio" name="shape" value="מרקיז" /> <span>מרקיז</span> <img src="./assets/diamond_shape/marquise_new.webp" alt="" /></label>
-            <label><input type="radio" name="shape" value="אובלי" /> <span>אובלי</span> <img src="./assets/diamond_shape/oval_new.webp" alt="" /></label>
-            <label><input type="radio" name="shape" value="אגס" /> <span>אגס</span> <img src="./assets/diamond_shape/pear_new.webp" alt="" /></label>
-            <label><input type="radio" name="shape" value="נסיכה" /> <span>נסיכה</span> <img src="./assets/diamond_shape/princess_new.webp" alt="" /></label>
+            <label><input type="radio" name="shape" value="מרקיזה" /> <span>מרקיזה</span> <img src="./assets/diamond_shape/marquise_new.webp" alt="" /></label>
+            <label><input type="radio" name="shape" value="אובל" /> <span>אובל</span> <img src="./assets/diamond_shape/oval_new.webp" alt="" /></label>
+            <label><input type="radio" name="shape" value="טיפה" /> <span>טיפה</span> <img src="./assets/diamond_shape/pear_new.webp" alt="" /></label>
+            <label><input type="radio" name="shape" value="פרינסס" /> <span>פרינסס</span> <img src="./assets/diamond_shape/princess_new.webp" alt="" /></label>
             <label><input type="radio" name="shape" value="עגול" /> <span>עגול</span> <img src="./assets/diamond_shape/round_new.webp" alt="" /></label>
-            <label><input type="radio" name="shape" value="אחר" /> <span>אחר</span></label>
+            <label>
+              <input type="radio" name="shape" value="אחר" id="shape_other_radio" />
+              <span>אחר</span>
+              <input type="text" id="shape_other_input" name="shape_other_input" placeholder="הכנס צורה" style="display:none; margin-top:8px; width:90px; font-size:1em;" autocomplete="off" />
+            </label>
           </div>
         </div>
 
@@ -246,7 +319,11 @@
             <label><input type="radio" name="carat" value="5" /> 5 קראט</label>
             <label><input type="radio" name="carat" value="5.5" /> 5.5 קראט</label>
             <label><input type="radio" name="carat" value="6" /> 6 קראט</label>
-            <label><input type="radio" name="carat" value="autre" /> אחר</label>
+            <label>
+              <input type="radio" name="carat" value="autre" id="carat_other_radio" />
+              אחר
+              <input type="text" id="carat_other_input" name="carat_other_input" placeholder="הכנס קראט" style="display:none; margin-right:8px; width:70px; font-size:1em;" autocomplete="off" />
+            </label>
           </div>
         </div>
 
@@ -254,15 +331,15 @@
 
         <div class="step" id="step8">
           <h2> צבע התכשיט</h2> 
-          <div class="choices">
-            <label><input type="radio" name="jewel-color" value="זהב" /> זהב</label>
-            <label><input type="radio" name="jewel-color" value="כסף" /> כסף</label>
-            <label><input type="radio" name="jewel-color" value="זהב-רוזה" /> זהב רוזה</label>
+          <div class="shape-choices">
+            <label><input type="radio" name="jewel-color" value="צהוב" /><span>צהוב</span><img src="./assets/colors/jaune.jpeg" alt="צהוב"></label>
+            <label><input type="radio" name="jewel-color" value="לבן" /><span>לבן</span><img src="./assets/colors/blanc.jpeg" alt="לבן"></label>
+            <label><input type="radio" name="jewel-color" value="אדום" /><span>אדום</span><img src="./assets/colors/or-rose.jpg" alt="אדום"></label>
           </div>
         </div>
 
         <div class="step" id="step9">
-          <h2> קראט המתכת</h2> 
+          <h2> סוג זהב </h2> 
           <div class="choices">
             <label><input type="radio" name="metal-carat" value="14K" /> 14K</label>
             <label><input type="radio" name="metal-carat" value="18K" /> 18K</label>
@@ -284,7 +361,9 @@
                     document.write('<option value="' + i + '">' + i + '</option>');
                   }
                 </script>
+                <option value="other">אחר</option>
               </select>
+              <input type="text" id="ring-size-other" name="ring-size-other" placeholder="הכנס מידה" style="display:none; margin-top:8px; width:90px; font-size:1em;" autocomplete="off" />
             </div>
             <div id="bracelet-container" class="size-option">
               <label for="bracelet-size">גודל הצמיד :</label>
@@ -295,7 +374,9 @@
                     document.write('<option value="' + i + '">' + i + '</option>');
                   }
                 </script>
+                <option value="other">אחר</option>
               </select>
+              <input type="text" id="bracelet-size-other" name="bracelet-size-other" placeholder="הכנס מידה" style="display:none; margin-top:8px; width:90px; font-size:1em;" autocomplete="off" />
             </div>
             <div id="collier-container" class="size-option">
             <label for="collier-size">אורך שרשרת :</label>
@@ -306,7 +387,9 @@
                     document.write('<option value="' + i + '">' + i + '</option>');
                   }
                 </script>
+                <option value="other">אחר</option>
               </select>
+              <input type="text" id="collier-size-other" name="collier-size-other" placeholder="הכנס מידה" style="display:none; margin-top:8px; width:90px; font-size:1em;" autocomplete="off" />
             </div>
             <div id="boucles-container" class="size-option">
               <label for="boucles-type">סוגי עגילים :</label>
@@ -314,7 +397,7 @@
                 <option value="">בחר סוג</option>
                 <option value="לחיצה">לחיצה</option>
                 <option value="מתלה">מתלה</option>
-                <option value="אברדה">אברדה</option>
+                <option value="הברגה">הברגה</option>
               </select>
             </div>
           </div>
@@ -353,3 +436,22 @@
   </div>
 </body>
 </html>
+
+
+<!-- <div id="user-summary" class="user-summary" style="display: none;">
+        <ul style="display: flex; justify-content: space-between;">
+            <li><strong>תכשיט: </strong> <span id="summary-jewel"></span></li>
+            <li><strong>סוג אבן: </strong> <span id="summary-gem"></span></li>
+            <li><strong>פריסה משולבת: </strong> <span id="summary-layout"></span></li>
+            <li><strong>מקור: </strong> <span id="summary-origin"></span></li>
+            <li><strong>אבן חן: </strong> <span id="summary-stone-type"></span></li>
+            <li><strong>צורה: </strong> <span id="summary-shape"></span></li>
+            <li><strong>קראט גודל:</strong> <span id="summary-stone-carat"></span></li>
+            <li><strong>צבע זהב:</strong> <span id="summary-color"></span></li>
+            <li><strong>קראט של זהב:</strong> <span id="summary-metal-carat"></span></li>
+            <li><strong>גודל צמיד:</strong> <span id="summary-bracelet-size"></span></li>
+            <li><strong>גודל טבעת:</strong> <span id="summary-ring-size"></span></li>
+            <li><strong>גודל שרשרת:</strong> <span id="summary-collier-size"></span></li>
+            <li><strong>סוג עגילים:</strong> <span id="summary-boucles-size"></span></li>
+        </ul>
+      </div> -->

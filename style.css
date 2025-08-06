@@ -1,5 +1,118 @@
-/* Importation de la police Inter depuis Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Custom input for 'other' size options in step 10 */
+
+input[type="text"]#ring-size-other,
+input[type="text"]#bracelet-size-other,
+input[type="text"]#collier-size-other {
+  border: 1.5px solid #bfa16b;
+  border-radius: 8px;
+  background: #fffbe9;
+  color: #222;
+  font-family: inherit;
+  font-size: 1em;
+  padding: 6px 10px;
+  margin-top: 6px;
+  box-shadow: 0 1px 4px rgba(191,161,107,0.08);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 110px;
+  max-width: 90%;
+}
+input[type="text"]#ring-size-other:focus,
+input[type="text"]#bracelet-size-other:focus,
+input[type="text"]#collier-size-other:focus {
+  border-color: #e0b96a;
+  box-shadow: 0 2px 8px rgba(191,161,107,0.18);
+  background: #fff7d6;
+}
+/* Custom input for 'other' options in steps 4, 6, 7 */
+input[type="text"][id$="_other_input"] {
+  border: 1.5px solid #bfa16b;
+  border-radius: 8px;
+  background: #fffbe9;
+  color: #222;
+  font-family: inherit;
+  font-size: 1em;
+  padding: 6px 10px;
+  margin-top: 6px;
+  box-shadow: 0 1px 4px rgba(191,161,107,0.08);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 110px;
+  max-width: 90%;
+}
+input[type="text"][id$="_other_input"]:focus {
+  border-color: #e0b96a;
+  box-shadow: 0 2px 8px rgba(191,161,107,0.18);
+  background: #fff7d6;
+}
+/* Flip card effect for precious stones */
+/* Flip card effect for precious stones: hover version, no info icon */
+.stone-flip {
+  display: inline-block;
+  margin: 0 10px 20px 10px;
+  perspective: 800px;
+  vertical-align: top;
+}
+.stone-flip input[type="radio"] {
+  display: none;
+}
+.flip-inner {
+  width: 140px;
+  height: 190px;
+  position: relative;
+  transition: transform 0.6s cubic-bezier(.4,2,.6,1);
+  transform-style: preserve-3d;
+}
+.stone-flip:hover .flip-inner {
+  transform: rotateY(180deg);
+}
+.flip-front, .flip-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  box-sizing: border-box;
+  text-align: center;
+}
+.flip-front img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  margin: 8px 0;
+  border-radius: 8px;
+}
+.flip-back {
+  background: #f7f7f7;
+  transform: rotateY(180deg);
+  color: #222;
+  font-size: 1em;
+  direction: rtl;
+  overflow-y: auto;
+}
+.stone-info-text {
+  min-height: 80px;
+  max-height: 140px;
+  overflow-y: auto;
+  width: 100%;
+  display: block;
+  margin-bottom: 0;
+  font-size: 1em;
+  line-height: 1.5;
+  padding: 0 2px;
+  word-break: break-word;
+}
+/* Importation de la police Inter depuis Google Fonts */
+
 
 /* Styles généraux du corps de la page */
 body {
@@ -71,6 +184,7 @@ body::before {
 
 .brand-socials {
     display: flex;
+    align-items: center;
     gap: 20px;
 }
 
@@ -140,11 +254,11 @@ body::before {
 }
 
 /* Sommaire utilisateur */
-.user-summary {
-    position: sticky; /* Reste en place lors du défilement */
-    top: 2rem; /* Distance du haut de l'écran */
-    flex-basis: 350px; /* Donne une largeur fixe au résumé */
-    flex-shrink: 0; /* Empêche le résumé de rétrécir */
+/* .user-summary {
+    position: sticky; 
+    top: 2rem; 
+    flex-basis: 350px; 
+    flex-shrink: 0; 
     padding: 1.5rem;
     background-color: #f9f9f9;
     border: 1px solid #ddd;
@@ -159,21 +273,21 @@ body::before {
     list-style: none;
     padding: 0;
     margin: 0;
-    display: flex; /* Maintient l'utilisation de Flexbox */
-    flex-direction: column; /* Mais en colonne ! */
-    gap: 1rem; /* Espace entre les éléments */
+    display: flex; 
+    flex-direction: column; 
+    gap: 1rem; 
 }
 
 .user-summary li {
-    flex: none; /* Ne pas se comporter comme un élément de ligne flex */
-    min-width: auto; /* Supprime la largeur minimale */
+    flex: none; 
+    min-width: auto; 
     margin-bottom: 0;
     font-size: 1rem;
 }
 
 .user-summary li strong {
     color: #333;
-}
+} */
 
 /* Étapes du formulaire */
 .step {
@@ -696,24 +810,24 @@ button:active {
     }
 
     /* Le résumé redevient un élément statique */
-    .user-summary {
+    /* .user-summary {
         position: static; 
-        /* width: 100%; */
+        
         max-width: 100%;
-        order: -1; /* Place le résumé au-dessus du conteneur du formulaire */
-    }
+        order: -1; 
+    } */
 
     /* Adapte la mise en page du résumé pour les écrans plus petits */
-    .user-summary ul {
-        flex-direction: row; /* Rétablit la disposition en ligne pour l'UL */
-        flex-wrap: wrap; /* Permet aux éléments de passer à la ligne */
+    /* .user-summary ul {
+        flex-direction: row; 
+        flex-wrap: wrap; 
         justify-content: space-between;
-    }
+    } */
 
-    .user-summary li {
-        flex: 1 1 45%; /* 2 éléments par ligne pour une meilleure utilisation de l'espace */
+    /* .user-summary li {
+        flex: 1 1 45%; 
         margin-bottom: 0.5rem;
-    }
+    } */
 
     .carousel-track img {
         width: 150px;
@@ -731,9 +845,9 @@ button:active {
 @media (max-width: 480px) {
     .logo-title {
         display: flex;
-        justify-content: center;
+        justify-content: space-around;
         align-items: center;
-        gap: 10px;
+        /* gap: 10px; */
     }
     .brand-header {
         padding: 1rem 0;
@@ -741,6 +855,12 @@ button:active {
 
     .brand-logo {
         max-width: 150px;
+    }
+
+    .brand-socials {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .hero {
@@ -796,18 +916,22 @@ button:active {
         width: 100%;
     }
 
+    .navigation-buttons > button {
+        width: 20%;
+    }
+
     .carousel button.prev,
     .carousel button.next {
         left: 5px;
         right: 5px;
     }
 
-    .user-summary ul {
-        flex-direction: column; /* Empile les éléments du résumé */
+    /* .user-summary ul {
+        flex-direction: column; 
     }
 
     .user-summary li {
-        flex: 1 1 100%; /* Un élément par ligne */
+        flex: 1 1 100%; 
         text-align: center;
-    }
+    } */
 }
