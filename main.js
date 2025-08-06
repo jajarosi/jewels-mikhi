@@ -1,3 +1,13 @@
+let currentStep = 0;
+let imgUrl = "";
+let our_creation = "";
+let stepHistory = ["step0"];
+const track = document.querySelector(".carousel-track");
+const images_carousel = track.querySelectorAll(".img_carousel");
+const selectedName = document.getElementById("selected-name");
+let selectedJewel = ""; 
+
+
 // --- Step 10: handle 'other' for ring-size, bracelet-size, collier-size ---
 function setupSizeOther(selectId, inputId, stepNum) {
   const select = document.getElementById(selectId);
@@ -33,28 +43,6 @@ setupSizeOther('ring-size', 'ring-size-other', 10);
 setupSizeOther('bracelet-size', 'bracelet-size-other', 10);
 setupSizeOther('collier-size', 'collier-size-other', 10);
 
-// On form submit, use the custom value if 'other' was selected
-document.addEventListener('DOMContentLoaded', function() {
-  const finalForm = document.getElementById('finalForm');
-  if (!finalForm) return;
-  finalForm.addEventListener('submit', function() {
-    const ringSelect = document.getElementById('ring-size');
-    const ringOther = document.getElementById('ring-size-other');
-    if (ringSelect && ringOther && ringSelect.value === 'other' && ringOther.value.trim()) {
-      ringSelect.value = ringOther.value.trim();
-    }
-    const braceletSelect = document.getElementById('bracelet-size');
-    const braceletOther = document.getElementById('bracelet-size-other');
-    if (braceletSelect && braceletOther && braceletSelect.value === 'other' && braceletOther.value.trim()) {
-      braceletSelect.value = braceletOther.value.trim();
-    }
-    const collierSelect = document.getElementById('collier-size');
-    const collierOther = document.getElementById('collier-size-other');
-    if (collierSelect && collierOther && collierSelect.value === 'other' && collierOther.value.trim()) {
-      collierSelect.value = collierOther.value.trim();
-    }
-  });
-});
 // --- Handle 'other' options for precious_stone, shape, carat ---
 document.addEventListener('DOMContentLoaded', function() {
   // Step 4: precious_stone
@@ -117,32 +105,8 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-
-  // On form submit, replace 'other' value with input if filled
-  const finalForm = document.getElementById('finalForm');
-  if (finalForm) {
-    finalForm.addEventListener('submit', function(e) {
-      // Step 4
-      if (preciousOtherRadio && preciousOtherInput && preciousOtherRadio.checked && preciousOtherInput.value.trim()) {
-        preciousOtherRadio.value = preciousOtherInput.value.trim();
-      } else if (preciousOtherRadio) {
-        preciousOtherRadio.value = 'אחר';
-      }
-      // Step 6
-      if (shapeOtherRadio && shapeOtherInput && shapeOtherRadio.checked && shapeOtherInput.value.trim()) {
-        shapeOtherRadio.value = shapeOtherInput.value.trim();
-      } else if (shapeOtherRadio) {
-        shapeOtherRadio.value = 'אחר';
-      }
-      // Step 7
-      if (caratOtherRadio && caratOtherInput && caratOtherRadio.checked && caratOtherInput.value.trim()) {
-        caratOtherRadio.value = caratOtherInput.value.trim();
-      } else if (caratOtherRadio) {
-        caratOtherRadio.value = 'autre';
-      }
-    });
-  }
 });
+
 // --- Flip card info for precious stones (step 4, hover version) ---
 document.addEventListener('DOMContentLoaded', function() {
   const stoneInfo = {
@@ -165,15 +129,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
-
-let currentStep = 0;
-let imgUrl = "";
-let our_creation = "";
-let stepHistory = ["step0"];
-const track = document.querySelector(".carousel-track");
-const images_carousel = track.querySelectorAll(".img_carousel");
-const selectedName = document.getElementById("selected-name");
-let selectedJewel = ""; 
 
 function showStep(stepId) {
   document.querySelectorAll(".step").forEach(step => step.classList.remove("active"));
@@ -228,6 +183,7 @@ function goToStep(stepNumber) {
     updateStep10Options();
   }
   showStep("step" + stepNumber);
+  focusContainer();
   updateNavigationButtons();
 }
 
@@ -250,14 +206,12 @@ function nextStep() {
   hideHeroSection();
   if (currentStep === 0) {
     const choice = document.querySelector('input[name="personalised"]:checked')?.value;
-
+    resetStepInputs();
     if (choice === "custom") {
       goToStep(1);
     } else if (choice === "upload") {
-      resetStepInputs();
       goToStep(12);
     } else if (choice === "model") {
-      resetStepInputs();
       goToStep(13);
     }
     return;
@@ -276,6 +230,29 @@ function nextStep() {
     return;
   }
 
+  if (currentStep === 3) {
+    const layout = document.querySelector('input[name="layout"]:checked')?.value;
+    if (layout) {
+      goToStep(14);
+    }
+    return;
+  }
+
+  if (currentStep === 14) {
+    const gemCentral = document.querySelector('input[name="gem_central"]:checked')?.value;
+    if (gemCentral === "אבן-חן") {
+      goToStep(15);
+    } else if (gemCentral === "יהלום" ) {
+      goToStep(16);
+    }
+    return;
+  }
+
+  if (currentStep === 23) {
+    goToStep(8);
+    return;
+  }
+
   if (currentStep === 1) {
     const jewelChoice = document.querySelector('input[name="jewel"]:checked')?.value;
     if (jewelChoice) {
@@ -284,11 +261,12 @@ function nextStep() {
   }
 
   // Avancer dans le flow normal
-  if (currentStep >= 1 && currentStep <= 10) {
+  if (currentStep >= 1 && currentStep <= 10 || currentStep >= 14 && currentStep <= 23) {
     goToStep(currentStep + 1);
     // document.getElementById("user-summary").style.display = "block";
     // updateUserSummary();
   }
+
 }
 
 function previousStep() {
@@ -296,6 +274,7 @@ function previousStep() {
     stepHistory.pop(); 
     const previousStepId = stepHistory[stepHistory.length - 1];
     currentStep = parseInt(previousStepId.replace("step", ""));
+    focusContainer();
     showStep(previousStepId);
   } 
   // if (currentStep < 1) {
@@ -314,6 +293,16 @@ function homePage() {
   document.getElementById('confirmBtn').style.display = "none";
 }
 
+function focusContainer(){
+  const container = document.querySelector('.main-content')
+  if (container){
+    container.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+      inline: 'nearest'
+    })
+  }
+}
 
 // Auto-advance logic, but NOT for 'other' in steps 4, 6, 7
 document.querySelectorAll('.step[id^="step"] input[type="radio"]').forEach(input => {
@@ -337,7 +326,33 @@ document.querySelectorAll('.step[id^="step"] input[type="radio"]').forEach(input
       return;
     }
 
-    if (stepNum >= 0 && stepNum <= 10) {
+    if (stepNum === 15 && input.id === 'precious_stone_other_radio_central') {
+      // Do not auto-advance, wait for input
+      return;
+    }
+
+    if (stepNum === 17 && input.id === 'shape_other_radio_central') {
+      return;
+    }
+
+    if (stepNum === 18 && input.id === 'carat_other_radio_central') {
+      return;
+    }
+
+    if (stepNum === 20 && input.id === 'precious_stone_other_radio_around') {
+      // Do not auto-advance, wait for input
+      return;
+    }
+
+    if (stepNum === 22 && input.id === 'shape_other_radio_around') {
+      return;
+    }
+
+    if (stepNum === 23 && input.id === 'carat_other_radio_around') {
+      return;
+    }
+
+    if (stepNum >= 0 && stepNum <= 10 || stepNum >= 14 && stepNum <= 23) {
       nextStep();
     }
   });
@@ -363,23 +378,43 @@ function setupOtherInputAdvance(radioId, inputId, stepNum) {
     tryAdvance();
   });
 }
+
 setupOtherInputAdvance('precious_stone_other_radio', 'precious_stone_other_input', 4);
 setupOtherInputAdvance('shape_other_radio', 'shape_other_input', 6);
 setupOtherInputAdvance('carat_other_radio', 'carat_other_input', 7);
+setupOtherInputAdvance('precious_stone_other_radio_central', 'precious_stone_other_input_central', 15);
+setupOtherInputAdvance('shape_other_radio_central', 'shape_other_input_central', 17);
+setupOtherInputAdvance('carat_other_radio_central', 'carat_other_input_central', 18);
+setupOtherInputAdvance('precious_stone_other_radio_around', 'precious_stone_other_input_around', 20);
+setupOtherInputAdvance('shape_other_radio_around', 'shape_other_input_around', 22);
+setupOtherInputAdvance('carat_other_radio_around', 'carat_other_input_around', 23);
 
 function resetStepInputs() {
   const radios = document.querySelectorAll(
-    '#step1 input[type="radio"], #step2 input[type="radio"], #step3 input[type="radio"], #step4 input[type="radio"], #step5 input[type="radio"], #step6 input[type="radio"], #step7 input[type="radio"], #step8 input[type="radio"], #step9 input[type="radio"], #step10 input[type="radio"]'
+    '#step1 input[type="radio"], #step2 input[type="radio"], #step3 input[type="radio"], #step4 input[type="radio"], #step5 input[type="radio"], #step6 input[type="radio"], #step7 input[type="radio"], #step8 input[type="radio"], #step9 input[type="radio"], #step10 input[type="radio"],#step14 input[type="radio"], #step15 input[type="radio"], #step16 input[type="radio"], #step17 input[type="radio"], #step18 input[type="radio"], #step19 input[type="radio"], #step20 input[type="radio"], #step21 input[type="radio"], #step22 input[type="radio"], #step23 input[type="radio"]'
   );
 
-  // console.log("Nombre de boutons radio ciblés :", radios.length);
-
   radios.forEach(input => {
-    // if (input.checked) {
-    //   console.log(`Décoché : ${input.name} => ${input.value}`);
-    // }
     input.checked = false;
   });
+
+  // --- NOUVEAUTÉ : Réinitialisation des variables d'image et des éléments d'UI associés ---
+  imgUrl = "";
+  our_creation = "";
+  
+  // Réinitialiser l'état du champ d'upload Care
+  const uploadcareInput = document.getElementById('uploadcareInput');
+  if (uploadcareInput && uploadcareInput.widget) {
+    uploadcareInput.widget.value(null);
+  }
+  document.getElementById('uploadStatus').textContent = "📎 Aucun fichier envoyé";
+  document.getElementById('confirmBtn').style.display = "none";
+
+  // Réinitialiser l'état du carousel
+  const selectedImages = document.querySelectorAll('.img_carousel.selected');
+  selectedImages.forEach(img => img.classList.remove("selected"));
+  document.getElementById('selected-name').textContent = "Aucune création sélectionnée";
+  document.getElementById('confirmImageBtn').style.display = "none";
 }
 
 uploadcare.Widget('[role=uploadcare-uploader]').onUploadComplete(function(info) {
@@ -391,71 +426,6 @@ uploadcare.Widget('[role=uploadcare-uploader]').onUploadComplete(function(info) 
         
   document.getElementById('confirmBtn').style.display = "inline-block";
 });
-
-// Soumission finale du formulaire
-function submitForm(e) {
-  e.preventDefault();
-
-  const submitBtn = document.getElementById('submitBtn');
-  const loadingMessage = document.getElementById('loadingMessage');
-  const finalForm = document.getElementById('finalForm');
-  const successMessage = document.getElementById('message');
-
-  if (loadingMessage) {
-    loadingMessage.classList.remove('hidden'); 
-  }
-  
-  if (submitBtn) {
-    submitBtn.style.display = 'none'; 
-  }
-
-  const data = new URLSearchParams();
-
-  data.append("name", document.querySelector('input[name="name"]')?.value || "");
-  data.append("email", document.querySelector('input[name="email"]')?.value || "");
-  data.append("phone", document.querySelector('input[name="phone"]')?.value || "");
-  data.append("comment", document.querySelector('textarea[name="comment"]')?.value || "");
-  data.append("jewel", document.querySelector('input[name="jewel"]:checked')?.value || "");
-  data.append("gem", document.querySelector('input[name="gem"]:checked')?.value || "");
-  data.append("layout", document.querySelector('input[name="layout"]:checked')?.value || "");
-  data.append("stone_type", document.querySelector('input[name="precious_stone"]:checked')?.value || "");
-  data.append("origin", document.querySelector('input[name="origin"]:checked')?.value || "");
-  data.append("shape", document.querySelector('input[name="shape"]:checked')?.value || "");
-  data.append("stone_carat", document.querySelector('input[name="carat"]:checked')?.value || "");
-  data.append("color", document.querySelector('input[name="jewel-color"]:checked')?.value || "");
-  data.append("metal_carat", document.querySelector('input[name="metal-carat"]:checked')?.value || "");
-  data.append("bracelet_size", document.getElementById("bracelet-size")?.value || "");
-  data.append("ring_size", document.getElementById("ring-size")?.value || "");
-  data.append("collier_size", document.getElementById("collier-size")?.value || "");
-  data.append("boucles_size", document.getElementById("boucles-type")?.value || "");
-  data.append("image", imgUrl || ""); 
-  data.append("creations", our_creation || "");
-
-  fetch('https://script.google.com/macros/s/AKfycbx90TwxknQ09GYNZhkGFWTkn2QHPE6gP1ry9O4n46jfkie-PcR4TldMncoCRd2nsabJ/exec', {
-  method: 'POST',
-  body: data,
-  mode: "no-cors"
-  }).then(() => {
-    finalForm.classList.remove('active');
-    successMessage.classList.remove('hidden');
-    if (loadingMessage) {
-        loadingMessage.classList.add('hidden');
-    }
-    setTimeout(() => {
-      window.location.reload();
-    }, 2000);
-  }).catch(() => {
-    finalForm.style.display = 'flex'
-    if (submitBtn) {
-        submitBtn.style.display = 'block';
-    }
-    if (loadingMessage) {
-        loadingMessage.classList.add('hidden');
-    }
-  });
-
-}
-
 
 images_carousel.forEach(img => {
   img.addEventListener('dblclick', function () {
@@ -505,27 +475,177 @@ function closeImageModal(event) {
 
 document.addEventListener('DOMContentLoaded', (event) => {
   const audio = document.getElementById('background-audio');
-
-  // Définir le volume une fois que l'élément est prêt à jouer
   audio.oncanplay = function() {
-      // Volume à 30%
       audio.volume = 0.005;
-      // Optionnel : Retirer 'muted' si vous l'avez ajouté en HTML
       audio.muted = false;
   };
-
-  // Si l'audio a déjà été chargé (par exemple, si la page est en cache),
-  // il se peut que l'événement 'oncanplay' ne se déclenche pas.
-  // On vérifie donc aussi directement.
-  if (audio.readyState >= 3) { // readyState 3 = HAVE_FUTURE_DATA
+  if (audio.readyState >= 3) { 
       audio.volume = 0.005;
       audio.muted = false;
   }
-
-  // Pour gérer les blocages d'autoplay, on pourrait aussi vouloir déclencher
-  // la lecture et le volume après la première interaction de l'utilisateur.
-  // Par exemple, en ajoutant un bouton "Activer le son".
 });
+
+
+function submitForm(e) {
+  e.preventDefault();
+
+  const submitBtn = document.getElementById('submitBtn');
+  const loadingMessage = document.getElementById('loadingMessage');
+  const finalForm = document.getElementById('finalForm');
+  const successMessage = document.getElementById('message');
+
+  if (loadingMessage) {
+    loadingMessage.classList.remove('hidden');
+  }
+
+  if (submitBtn) {
+    submitBtn.style.display = 'none';
+  }
+
+  const data = new URLSearchParams();
+
+  // --- Collecte des données avec gestion des champs "autre" ---
+
+  // Données de contact
+  data.append("name", document.querySelector('input[name="name"]')?.value || "");
+  data.append("email", document.querySelector('input[name="email"]')?.value || "");
+  data.append("phone", document.querySelector('input[name="phone"]')?.value || "");
+  data.append("comment", document.querySelector('textarea[name="comment"]')?.value || "");
+
+  // Type de bijou
+  data.append("jewel", document.querySelector('input[name="jewel"]:checked')?.value || "");
+  data.append("gem", document.querySelector('input[name="gem"]:checked')?.value || "");
+  data.append("layout", document.querySelector('input[name="layout"]:checked')?.value || "");
+  data.append("origin", document.querySelector('input[name="origin"]:checked')?.value || "");
+  data.append("color", document.querySelector('input[name="jewel-color"]:checked')?.value || "");
+  data.append("metal_carat", document.querySelector('input[name="metal-carat"]:checked')?.value || "");
+
+  // Champs "autre" pour la pierre précieuse
+  let preciousStoneValue = document.querySelector('input[name="precious_stone"]:checked')?.value || "";
+  if (preciousStoneValue === "אחר") {
+    const preciousOtherInput = document.getElementById('precious_stone_other_input');
+    preciousStoneValue = preciousOtherInput?.value.trim() || "אחר";
+  }
+  data.append("stone_type", preciousStoneValue);
+
+  // Champs "autre" pour la forme
+  let shapeValue = document.querySelector('input[name="shape"]:checked')?.value || "";
+  if (shapeValue === "אחר") {
+    const shapeOtherInput = document.getElementById('shape_other_input');
+    shapeValue = shapeOtherInput?.value.trim() || "אחר";
+  }
+  data.append("shape", shapeValue);
+
+  // Champs "autre" pour le carat
+  let caratValue = document.querySelector('input[name="carat"]:checked')?.value || "";
+  if (caratValue === "autre" || caratValue === "אחר") { // J'ai inclus "אחר" au cas où
+    const caratOtherInput = document.getElementById('carat_other_input');
+    caratValue = caratOtherInput?.value.trim() || "autre";
+  }
+  data.append("stone_carat", caratValue);
+
+  // Champs pour la pierre central
+  data.append("gem_central", document.querySelector('input[name="gem_central"]:checked')?.value || "");
+  data.append("origin_central", document.querySelector('input[name="origin_central"]:checked')?.value || "");
+
+  let preciousStoneCentralValue = document.querySelector('input[name="precious_stone_central"]:checked')?.value || "";
+  if (preciousStoneCentralValue === "אחר") {
+      const preciousOtherInput = document.getElementById('precious_stone_other_input_central');
+      preciousStoneCentralValue = preciousOtherInput?.value.trim() || "אחר";
+  }
+  data.append("stone_type_central", preciousStoneCentralValue);
+
+  let shapeCentralValue = document.querySelector('input[name="shape_central"]:checked')?.value || "";
+  if (shapeCentralValue === "אחר") {
+      const shapeOtherInput = document.getElementById('shape_other_input_central');
+      shapeCentralValue = shapeOtherInput?.value.trim() || "אחר";
+  }
+  data.append("shape_central", shapeCentralValue);
+
+  let caratCentralValue = document.querySelector('input[name="carat_central"]:checked')?.value || "";
+  if (caratCentralValue === "autre" || caratCentralValue === "אחר") { // J'ai inclus "אחר" au cas où
+      const caratOtherInput = document.getElementById('carat_other_input_central');
+      caratCentralValue = caratOtherInput?.value.trim() || "autre";
+  }
+  data.append("stone_carat_central", caratCentralValue);
+
+  // Champs pour la pierre autour
+  data.append("gem_around", document.querySelector('input[name="gem_around"]:checked')?.value || "");
+  data.append("origin_around", document.querySelector('input[name="origin_around"]:checked')?.value || "");
+
+  let preciousStoneAroundValue = document.querySelector('input[name="precious_stone_around"]:checked')?.value || "";
+  if (preciousStoneAroundValue === "אחר") {
+      const preciousOtherInput = document.getElementById('precious_stone_other_input_around');
+      preciousStoneAroundValue = preciousOtherInput?.value.trim() || "אחר";
+  }
+  data.append("stone_type_around", preciousStoneAroundValue);
+
+  let shapeAroundValue = document.querySelector('input[name="shape_around"]:checked')?.value || "";
+  if (shapeAroundValue === "אחר") {
+      const shapeOtherInput = document.getElementById('shape_other_input_around');
+      shapeAroundValue = shapeOtherInput?.value.trim() || "אחר";
+  }
+  data.append("shape_around", shapeAroundValue);
+
+  let caratAroundValue = document.querySelector('input[name="carat_around"]:checked')?.value || "";
+  if (caratAroundValue === "autre" || caratAroundValue === "אחר") { // J'ai inclus "אחר" au cas où
+      const caratOtherInput = document.getElementById('carat_other_input_around');
+      caratAroundValue = caratOtherInput?.value.trim() || "autre";
+  }
+  data.append("stone_carat_around", caratAroundValue);
+
+  // Champs "autre" pour les tailles (ring, bracelet, collier)
+  let ringSizeValue = document.getElementById("ring-size")?.value || "";
+  if (ringSizeValue === "other") {
+    ringSizeValue = document.getElementById("ring-size-other")?.value.trim() || "other";
+  }
+  data.append("ring_size", ringSizeValue);
+
+  let braceletSizeValue = document.getElementById("bracelet-size")?.value || "";
+  if (braceletSizeValue === "other") {
+    braceletSizeValue = document.getElementById("bracelet-size-other")?.value.trim() || "other";
+  }
+  data.append("bracelet_size", braceletSizeValue);
+
+  let collierSizeValue = document.getElementById("collier-size")?.value || "";
+  if (collierSizeValue === "other") {
+    collierSizeValue = document.getElementById("collier-size-other")?.value.trim() || "other";
+  }
+  data.append("collier_size", collierSizeValue);
+  
+  // Type de boucle d'oreille
+  data.append("boucles_size", document.getElementById("boucles-type")?.value || "");
+
+  // Gestion des images
+  data.append("image", imgUrl || "");
+  data.append("creations", our_creation || "");
+
+
+  // --- Envoi du formulaire ---
+  fetch('https://script.google.com/macros/s/AKfycbwR_hiMi_2NFworplMp_m2idf7MIB6bfxWS-p6T4F_w8XdAMrdJTvGWTW48YfmVwFo/exec', {
+    method: 'POST',
+    body: data,
+    mode: "no-cors"
+  }).then(() => {
+    finalForm.classList.remove('active');
+    successMessage.classList.remove('hidden');
+    if (loadingMessage) {
+        loadingMessage.classList.add('hidden');
+    }
+    setTimeout(() => {
+      window.location.reload();
+    }, 2000);
+  }).catch(() => {
+    finalForm.style.display = 'flex'
+    if (submitBtn) {
+        submitBtn.style.display = 'block';
+    }
+    if (loadingMessage) {
+        loadingMessage.classList.add('hidden');
+    }
+  });
+
+}
 
 // function updateUserSummary() {
 //   document.getElementById("summary-jewel").textContent = document.querySelector('input[name="jewel"]:checked')?.value || "-";
