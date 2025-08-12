@@ -299,15 +299,15 @@ function previousStep() {
   updateNavigationButtons();
 }
 
-function homePage() {
-  currentStep = 0;
-  stepHistory = ["step0"];
-  showStep("step0");
-  updateNavigationButtons();
-  resetStepInputs();
-  document.getElementById('uploadStatus').textContent = "";
-  document.getElementById('confirmBtn').style.display = "none";
-}
+// function homePage() {
+//   currentStep = 0;
+//   stepHistory = ["step0"];
+//   showStep("step0");
+//   updateNavigationButtons();
+//   resetStepInputs();
+//   document.getElementById('uploadStatus').textContent = "";
+//   document.getElementById('confirmBtn').style.display = "none";
+// }
 
 function focusContainer(){
   const container = document.querySelector('.main-content')

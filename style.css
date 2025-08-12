@@ -257,10 +257,25 @@ body::before {
 }
 
 .container h1 {
-    font-size: 2rem;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;          /* autorise retour à la ligne si écran petit */
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    
+    padding: 12px 28px;       /* <--- IMPORTANT : espace entre texte/emoji et bordure */
+    border-radius: 15px;
+    border: 2px solid #d4af37;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    box-sizing: border-box;   /* assure que padding est pris en compte proprement */
+    text-align: center;
     color: #8B4513;
-    margin-bottom: 2rem;
-    font-weight: 600;
+    white-space: normal;      /* autorise retour à la ligne si besoin */
+    margin: 0 auto 2rem;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+
 }
 
 /* Sommaire utilisateur */
@@ -727,7 +742,7 @@ button:active {
 .footer p {
     margin: 0;
     font-size: 0.9rem;
-    color: #000000;
+    color: #f9f9f9;
 }
 
 .footer a {
