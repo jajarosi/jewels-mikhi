@@ -23,7 +23,9 @@
   <header class="brand-header">
     <div class="logo-title">
       <!-- <h1 class="brand-name">Michael_Bloch</h1> -->
-      <img src="assets/icons/michael-bloch.png" alt="Logo" class="brand-logo" style="width: 375px; object-fit: contain;" />
+      <a href="">
+        <img src="assets/icons/michael-bloch.png" alt="Logo" class="brand-logo" style="width: 375px; object-fit: contain;"/>
+      </a>
       <div class="brand-socials">
         <a href="https://www.instagram.com/michael__bloch" target="_blank">
           <img src="assets/icons/instagram-icon.png" alt="Instagram" style="width: 32px; height: 32px; object-fit: contain; cursor: pointer;" />
@@ -33,9 +35,9 @@
           <img src="./assets/icons/whatsapp.png" alt="whatsapp" style="width: 32px; height: 32px; object-fit: contain; cursor: pointer;">
         </a>
         <!-- add tel link -->
-        <a href="tel:+972522710675" target="_blank" style="text-decoration: none; color: inherit;">
+        <!-- <a href="tel:+972522710675" target="_blank" style="text-decoration: none; color: inherit;">
            52-271-0675 972+
-        </a>
+        </a> -->
       </div>
 
     </div>
@@ -53,9 +55,10 @@
     <div class="form-container-wrapper">
       
       <div class="container">
-        <h1> איך תרצו לעצב את התכשיט שלכם ? 💎 </h1>
+        <h1 > איך תרצו לעצב את התכשיט שלכם ? 💎 </h1>
 
         <div class="navigation-buttons">
+          <button id="previousBtn" onclick="previousStep()">קודם</button>
           <button id="homeBtn" onclick="homePage()">דף הבית</button>
           <!-- <button id="nextBtn" onclick="nextStep()">הבא</button> -->
         </div>
@@ -147,7 +150,7 @@
                 <div class="flip-inner">
                 <div class="flip-front">
                     <span>רובי</span>
-                    <img src="./assets/precious_stone/rubis.jpg" alt="רובי">
+                    <img src="./assets/precious_stone/rubis.png" alt="רובי">
                 </div>
                 <div class="flip-back">
                     <div class="stone-info-text"></div>
@@ -159,7 +162,7 @@
                 <div class="flip-inner">
                 <div class="flip-front">
                     <span>ספיר</span>
-                    <img src="./assets/precious_stone/saphir.avif" alt="ספיר">
+                    <img src="./assets/precious_stone/saphir.png" alt="ספיר">
                 </div>
                 <div class="flip-back">
                     <div class="stone-info-text"></div>
@@ -171,7 +174,7 @@
                 <div class="flip-inner">
                 <div class="flip-front">
                     <span>אמרלד</span>
-                    <img src="./assets/precious_stone/emeraude.avif" alt="אמרלד">
+                    <img src="./assets/precious_stone/emeraude.png" alt="אמרלד">
                 </div>
                 <div class="flip-back">
                     <div class="stone-info-text"></div>
@@ -183,7 +186,7 @@
                 <div class="flip-inner">
                 <div class="flip-front">
                     <span>בלו טופז</span>
-                    <img src="./assets/precious_stone/topaze_bleu.avif" alt="בלו טופז">
+                    <img src="./assets/precious_stone/topaze_bleu.png" alt="בלו טופז">
                 </div>
                 <div class="flip-back">
                     <div class="stone-info-text"></div>
@@ -195,7 +198,7 @@
                 <div class="flip-inner">
                 <div class="flip-front">
                     <span>טורמלין</span>
-                    <img src="./assets/precious_stone/tourmaline.jpg" alt="טורמלין">
+                    <img src="./assets/precious_stone/tourmaline.png" alt="טורמלין">
                 </div>
                 <div class="flip-back">
                     <div class="stone-info-text"></div>
@@ -207,7 +210,7 @@
                 <div class="flip-inner">
                 <div class="flip-front">
                     <span>ציטרין</span>
-                    <img src="./assets/precious_stone/citrine.jpeg" alt="ציטרין">
+                    <img src="./assets/precious_stone/citrine.png" alt="ציטרין">
                 </div>
                 <div class="flip-back">
                     <div class="stone-info-text"></div>
@@ -219,7 +222,7 @@
                 <div class="flip-inner">
                 <div class="flip-front">
                     <span>פנינים</span>
-                    <img src="./assets/precious_stone/perles.avif" alt="פנינים">
+                    <img src="./assets/precious_stone/perles.png" alt="פנינים">
                 </div>
                 <div class="flip-back">
                     <div class="stone-info-text"></div>
@@ -325,7 +328,7 @@
                 <div class="flip-inner">
                 <div class="flip-front">
                     <span>רובי</span>
-                    <img src="./assets/precious_stone/rubis.jpg" alt="רובי">
+                    <img src="./assets/precious_stone/rubis.png" alt="רובי">
                 </div>
                 <div class="flip-back">
                     <div class="stone-info-text"></div>
@@ -337,7 +340,7 @@
                 <div class="flip-inner">
                 <div class="flip-front">
                     <span>ספיר</span>
-                    <img src="./assets/precious_stone/saphir.avif" alt="ספיר">
+                    <img src="./assets/precious_stone/saphir.png" alt="ספיר">
                 </div>
                 <div class="flip-back">
                     <div class="stone-info-text"></div>
@@ -349,7 +352,7 @@
                 <div class="flip-inner">
                 <div class="flip-front">
                     <span>אמרלד</span>
-                    <img src="./assets/precious_stone/emeraude.avif" alt="אמרלד">
+                    <img src="./assets/precious_stone/emeraude.png" alt="אמרלד">
                 </div>
                 <div class="flip-back">
                     <div class="stone-info-text"></div>
@@ -361,7 +364,7 @@
                 <div class="flip-inner">
                 <div class="flip-front">
                     <span>בלו טופז</span>
-                    <img src="./assets/precious_stone/topaze_bleu.avif" alt="בלו טופז">
+                    <img src="./assets/precious_stone/topaze_bleu.png" alt="בלו טופז">
                 </div>
                 <div class="flip-back">
                     <div class="stone-info-text"></div>
@@ -373,7 +376,7 @@
                 <div class="flip-inner">
                 <div class="flip-front">
                     <span>טורמלין</span>
-                    <img src="./assets/precious_stone/tourmaline.jpg" alt="טורמלין">
+                    <img src="./assets/precious_stone/tourmaline.png" alt="טורמלין">
                 </div>
                 <div class="flip-back">
                     <div class="stone-info-text"></div>
@@ -385,7 +388,7 @@
                 <div class="flip-inner">
                 <div class="flip-front">
                     <span>ציטרין</span>
-                    <img src="./assets/precious_stone/citrine.jpeg" alt="ציטרין">
+                    <img src="./assets/precious_stone/citrine.png" alt="ציטרין">
                 </div>
                 <div class="flip-back">
                     <div class="stone-info-text"></div>
@@ -397,7 +400,7 @@
                 <div class="flip-inner">
                 <div class="flip-front">
                     <span>פנינים</span>
-                    <img src="./assets/precious_stone/perles.avif" alt="פנינים">
+                    <img src="./assets/precious_stone/perles.png" alt="פנינים">
                 </div>
                 <div class="flip-back">
                     <div class="stone-info-text"></div>
@@ -505,7 +508,7 @@
           <div class="choices">
             <label><input type="radio" name="gem" value="יהלום" /> יהלום</label>
             <label><input type="radio" name="gem" value="אבן-חן" /> אבן חן</label>
-            <label><input type="radio" name="gem" value="משולב" /> משולב משניהם</label>
+            <label><input type="radio" name="gem" value="משולב" /> שילוב חופשי </label>
           </div>
         </div>
 
@@ -530,7 +533,7 @@
               <div class="flip-inner">
                 <div class="flip-front">
                   <span>רובי</span>
-                  <img src="./assets/precious_stone/rubis.jpg" alt="רובי">
+                  <img src="./assets/precious_stone/rubis.png" alt="רובי">
                 </div>
                 <div class="flip-back">
                   <div class="stone-info-text"></div>
@@ -542,7 +545,7 @@
               <div class="flip-inner">
                 <div class="flip-front">
                   <span>ספיר</span>
-                  <img src="./assets/precious_stone/saphir.avif" alt="ספיר">
+                  <img src="./assets/precious_stone/saphir.png" alt="ספיר">
                 </div>
                 <div class="flip-back">
                   <div class="stone-info-text"></div>
@@ -554,7 +557,7 @@
               <div class="flip-inner">
                 <div class="flip-front">
                   <span>אמרלד</span>
-                  <img src="./assets/precious_stone/emeraude.avif" alt="אמרלד">
+                  <img src="./assets/precious_stone/emeraude.png" alt="אמרלד">
                 </div>
                 <div class="flip-back">
                   <div class="stone-info-text"></div>
@@ -566,7 +569,7 @@
               <div class="flip-inner">
                 <div class="flip-front">
                   <span>בלו טופז</span>
-                  <img src="./assets/precious_stone/topaze_bleu.avif" alt="בלו טופז">
+                  <img src="./assets/precious_stone/topaze_bleu.png" alt="בלו טופז">
                 </div>
                 <div class="flip-back">
                   <div class="stone-info-text"></div>
@@ -578,7 +581,7 @@
               <div class="flip-inner">
                 <div class="flip-front">
                   <span>טורמלין</span>
-                  <img src="./assets/precious_stone/tourmaline.jpg" alt="טורמלין">
+                  <img src="./assets/precious_stone/tourmaline.png" alt="טורמלין">
                 </div>
                 <div class="flip-back">
                   <div class="stone-info-text"></div>
@@ -590,7 +593,7 @@
               <div class="flip-inner">
                 <div class="flip-front">
                   <span>ציטרין</span>
-                  <img src="./assets/precious_stone/citrine.jpeg" alt="ציטרין">
+                  <img src="./assets/precious_stone/citrine.png" alt="ציטרין">
                 </div>
                 <div class="flip-back">
                   <div class="stone-info-text"></div>
@@ -602,7 +605,7 @@
               <div class="flip-inner">
                 <div class="flip-front">
                   <span>פנינים</span>
-                  <img src="./assets/precious_stone/perles.avif" alt="פנינים">
+                  <img src="./assets/precious_stone/perles.png" alt="פנינים">
                 </div>
                 <div class="flip-back">
                   <div class="stone-info-text"></div>
@@ -797,6 +800,28 @@
   <div id="imageModal" class="modal" onclick="closeImageModal(event)">
     <img id="modalImage" class="modal-content" />
   </div>
+  <script>
+    window.addEventListener("load", moveSocials);
+    window.addEventListener("resize", moveSocials);
+
+    function moveSocials() {
+        const socials = document.querySelector(".brand-socials");
+        const footer = document.querySelector(".footer");
+        const header = document.querySelector(".logo-title");
+
+        if (window.innerWidth <= 768) {
+            // Si mobile → mettre dans le footer
+            if (!footer.contains(socials)) {
+                footer.appendChild(socials);
+            }
+        } else {
+            // Si desktop → remettre dans le header
+            if (!header.contains(socials)) {
+                header.appendChild(socials);
+            }
+        }
+    }
+  </script>
 </body>
 </html>
 

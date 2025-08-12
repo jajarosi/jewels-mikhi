@@ -150,6 +150,21 @@ function hideHeroSection() {
     }
 }
 
+function hideHTitle() {
+    const container = document.querySelector('.container h1');
+    if (container) {
+        // Ajoute un effet de fondu-enchaîné (fade-out) pour une transition plus douce
+        container.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+        container.style.opacity = '0';
+        container.style.transform = 'translateY(-20px)'; // Léger mouvement vers le haut
+
+        // Une fois la transition terminée, on masque l'élément
+        setTimeout(() => {
+            container.style.display = 'none';
+        }, 500); // 500ms correspond à la durée de la transition
+    }
+}
+
 function updateStep10Options() {
   const ringContainer = document.getElementById('ring-container');
   const braceletContainer = document.getElementById('bracelet-container');
@@ -204,6 +219,7 @@ function updateNavigationButtons() {
 // Avancer à l'étape suivante
 function nextStep() {
   hideHeroSection();
+  hideHTitle();
   if (currentStep === 0) {
     const choice = document.querySelector('input[name="personalised"]:checked')?.value;
     resetStepInputs();

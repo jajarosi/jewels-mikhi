@@ -125,7 +125,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh; /* La hauteur minimale est de 100% de la hauteur de la fenêtre */
-    background-image: url('./assets/creations/quatre-b-b-ecrain.jpeg'); /* Image de fond */
+    background-image: url('./assets/background/trois-b-main.jpeg'); /* Image de fond */
     background-size: cover; /* Couvre toute la zone */
     background-position: center; /* Centre l'image */
     background-attachment: fixed; /* L'image reste fixe lors du défilement */
@@ -301,6 +301,9 @@ body::before {
 }
 
 .step h2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-size: 1.8rem;
     color: #8B4513;
     margin-bottom: 1.5rem;
@@ -467,6 +470,13 @@ button:active {
     text-align: center;
 }
 
+.size-option select:focus {
+    outline: none; /* enlève le contour bleu */
+    box-shadow: none; /* enlève la lueur */
+    border-color: #8B4513; /* garde ta couleur de bordure */
+    background-color: #F5EDE3; /* garde ton fond */
+}
+
 /* Formulaire final (step 11) */
 #finalForm {
     display: flex;
@@ -480,6 +490,7 @@ button:active {
 #finalForm input[type="tel"],
 #finalForm textarea {
     width: calc(100% - 30px); /* Prend presque toute la largeur */
+    text-align: right;
     padding: 12px 15px;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -501,10 +512,10 @@ button:active {
 }
 
 #finalForm button[type="submit"] {
-    background-color: #d4af37;
-    width: auto; /* Largeur automatique pour le bouton Envoyer */
-    align-self: center; /* Centre le bouton */
-    margin-top: 1rem;
+    background-color: #4CAF50;
+    width: fit-content;
+    margin: 1rem auto 0 auto; /* centre horizontalement */
+    display: block;
 }
 
 #message {
@@ -690,7 +701,7 @@ button:active {
 /* Pied de page */
 .footer {
     /* background-color: #fff; */
-    background-color: rgba(0, 0, 0, 0.015);
+    background-color: rgba(253, 252, 252, 0.15);
     color: #333;
     text-align: center;
     padding: 1.5rem 0;
@@ -762,6 +773,12 @@ button:active {
 
 /* Media Queries pour la réactivité */
 @media (max-width: 768px) {
+
+    .logo-title{
+        flex-direction: column; /* Colonne pour les écrans plus petits */
+        align-items: center; /* Centre les éléments */
+    }
+
     .brand-logo {
         max-width: 200px;
     }
