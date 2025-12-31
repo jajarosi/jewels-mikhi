@@ -105,6 +105,122 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+
+  // Step 15/17/18 (central) - handle 'other' visibility for central step radios
+  const preciousOtherRadioCentral = document.getElementById('precious_stone_other_radio_central');
+  const preciousOtherInputCentral = document.getElementById('precious_stone_other_input_central');
+  if (preciousOtherRadioCentral && preciousOtherInputCentral) {
+    preciousOtherRadioCentral.addEventListener('change', function() {
+      if (preciousOtherRadioCentral.checked) {
+        preciousOtherInputCentral.style.display = 'inline-block';
+        preciousOtherInputCentral.focus();
+      }
+    });
+    document.querySelectorAll('input[name="precious_stone_central"]').forEach(radio => {
+      if (radio !== preciousOtherRadioCentral) {
+        radio.addEventListener('change', function() {
+          preciousOtherInputCentral.style.display = 'none';
+          preciousOtherInputCentral.value = '';
+        });
+      }
+    });
+  }
+
+  const shapeOtherRadioCentral = document.getElementById('shape_other_radio_central');
+  const shapeOtherInputCentral = document.getElementById('shape_other_input_central');
+  if (shapeOtherRadioCentral && shapeOtherInputCentral) {
+    shapeOtherRadioCentral.addEventListener('change', function() {
+      if (shapeOtherRadioCentral.checked) {
+        shapeOtherInputCentral.style.display = 'inline-block';
+        shapeOtherInputCentral.focus();
+      }
+    });
+    document.querySelectorAll('input[name="shape_central"]').forEach(radio => {
+      if (radio !== shapeOtherRadioCentral) {
+        radio.addEventListener('change', function() {
+          shapeOtherInputCentral.style.display = 'none';
+          shapeOtherInputCentral.value = '';
+        });
+      }
+    });
+  }
+
+  const caratOtherRadioCentral = document.getElementById('carat_other_radio_central');
+  const caratOtherInputCentral = document.getElementById('carat_other_input_central');
+  if (caratOtherRadioCentral && caratOtherInputCentral) {
+    caratOtherRadioCentral.addEventListener('change', function() {
+      if (caratOtherRadioCentral.checked) {
+        caratOtherInputCentral.style.display = 'inline-block';
+        caratOtherInputCentral.focus();
+      }
+    });
+    document.querySelectorAll('input[name="carat_central"]').forEach(radio => {
+      if (radio !== caratOtherRadioCentral) {
+        radio.addEventListener('change', function() {
+          caratOtherInputCentral.style.display = 'none';
+          caratOtherInputCentral.value = '';
+        });
+      }
+    });
+  }
+
+  // Step 20/22/23 (around) - handle 'other' visibility for around step radios
+  const preciousOtherRadioAround = document.getElementById('precious_stone_other_radio_around');
+  const preciousOtherInputAround = document.getElementById('precious_stone_other_input_around');
+  if (preciousOtherRadioAround && preciousOtherInputAround) {
+    preciousOtherRadioAround.addEventListener('change', function() {
+      if (preciousOtherRadioAround.checked) {
+        preciousOtherInputAround.style.display = 'inline-block';
+        preciousOtherInputAround.focus();
+      }
+    });
+    document.querySelectorAll('input[name="precious_stone_around"]').forEach(radio => {
+      if (radio !== preciousOtherRadioAround) {
+        radio.addEventListener('change', function() {
+          preciousOtherInputAround.style.display = 'none';
+          preciousOtherInputAround.value = '';
+        });
+      }
+    });
+  }
+
+  const shapeOtherRadioAround = document.getElementById('shape_other_radio_around');
+  const shapeOtherInputAround = document.getElementById('shape_other_input_around');
+  if (shapeOtherRadioAround && shapeOtherInputAround) {
+    shapeOtherRadioAround.addEventListener('change', function() {
+      if (shapeOtherRadioAround.checked) {
+        shapeOtherInputAround.style.display = 'inline-block';
+        shapeOtherInputAround.focus();
+      }
+    });
+    document.querySelectorAll('input[name="shape_around"]').forEach(radio => {
+      if (radio !== shapeOtherRadioAround) {
+        radio.addEventListener('change', function() {
+          shapeOtherInputAround.style.display = 'none';
+          shapeOtherInputAround.value = '';
+        });
+      }
+    });
+  }
+
+  const caratOtherRadioAround = document.getElementById('carat_other_radio_around');
+  const caratOtherInputAround = document.getElementById('carat_other_input_around');
+  if (caratOtherRadioAround && caratOtherInputAround) {
+    caratOtherRadioAround.addEventListener('change', function() {
+      if (caratOtherRadioAround.checked) {
+        caratOtherInputAround.style.display = 'inline-block';
+        caratOtherInputAround.focus();
+      }
+    });
+    document.querySelectorAll('input[name="carat_around"]').forEach(radio => {
+      if (radio !== caratOtherRadioAround) {
+        radio.addEventListener('change', function() {
+          caratOtherInputAround.style.display = 'none';
+          caratOtherInputAround.value = '';
+        });
+      }
+    });
+  }
 });
 
 // --- Flip card info for precious stones (step 4, hover version) ---
@@ -119,9 +235,10 @@ document.addEventListener('DOMContentLoaded', function() {
     'פנינים': 'פנינים הן תוצר טבעי של צדפות, מסמלות טוהר, חן ואלגנטיות נצחית.',
     'אחר': 'אבן חן ייחודית לבחירתכם. נשמח לספק מידע נוסף בהתאמה אישית.'
   };
-  // Set info text for each flip card
-  document.querySelectorAll('#step4 .stone-flip').forEach(label => {
+  // Set info text for each flip card (apply to all steps that use .stone-flip)
+  document.querySelectorAll('.stone-flip').forEach(label => {
     const radio = label.querySelector('input[type="radio"]');
+    if (!radio) return;
     const stone = radio.value;
     const infoText = label.querySelector('.stone-info-text');
     if (infoText && stoneInfo[stone]) {
@@ -133,6 +250,29 @@ document.addEventListener('DOMContentLoaded', function() {
 function showStep(stepId) {
   document.querySelectorAll(".step").forEach(step => step.classList.remove("active"));
   document.getElementById(stepId).classList.add("active");
+}
+
+// Small helper to show a temporary notice to the user
+function showTemporaryNotice(text, duration = 4000) {
+  let container = document.querySelector('.container') || document.querySelector('.main-content');
+  if (!container) return;
+  let notice = document.getElementById('flowNotice');
+  if (!notice) {
+    notice = document.createElement('div');
+    notice.id = 'flowNotice';
+    notice.style.cssText = 'background:#fff8c6;border-left:4px solid #f0c040;padding:10px 14px;margin-bottom:12px;border-radius:4px;direction:rtl;font-size:0.95em;';
+    container.insertBefore(notice, container.firstChild);
+  }
+  notice.textContent = text;
+  notice.style.opacity = '1';
+  notice.style.display = 'block';
+  setTimeout(() => {
+    notice.style.transition = 'opacity 0.4s ease';
+    notice.style.opacity = '0';
+    setTimeout(() => {
+      if (notice && notice.parentNode) notice.parentNode.removeChild(notice);
+    }, 450);
+  }, duration);
 }
 
 function hideHeroSection() {
@@ -211,7 +351,7 @@ function updateNavigationButtons() {
 
   previousBtn.style.display = currentStep > 0 ? "inline-block" : "none";
   homeBtn.style.display = currentStep > 0 ? "inline-block" : "none";
-  nextBtn.style.display = currentStep < 11 ? "inline-block" : "none";
+  nextBtn.style.display = (currentStep < 11) ? "inline-block" : "none";
   finalForm.style.display = currentStep === 11 ? "block" : "none";
 }
 
@@ -265,19 +405,53 @@ function nextStep() {
   }
 
   if (currentStep === 23) {
-    goToStep(8);
+    // If user chose Halo (yes) in step 18, proceed to central flow (step 2).
+    const aroundChoice = document.querySelector('input[name="choice-around"]:checked')?.value;
+    if (aroundChoice === 'yes') {
+      goToStep(2);
+      showTemporaryNotice('בחרתם קודם את האבנים מסביב — עכשיו חזרנו לבחור את האבן המרכזית', 5000);
+    } else {
+      goToStep(8);
+    }
     return;
   }
 
+  // Special flow: after choosing jewel (step 1) go to steps 18-23 flow
   if (currentStep === 1) {
     const jewelChoice = document.querySelector('input[name="jewel"]:checked')?.value;
-    if (jewelChoice) {
-      selectedJewel = jewelChoice;
-    }
+    if (jewelChoice) selectedJewel = jewelChoice;
+    goToStep(18);
+    return;
   }
 
-  // Avancer dans le flow normal
-  if (currentStep >= 1 && currentStep <= 10 || currentStep >= 14 && currentStep <= 23) {
+  // If we're on the initial choice of combined layout (step 18) branch according to the user's choice
+  if (currentStep === 18) {
+    const choice = document.querySelector('input[name="choice-around"]:checked')?.value;
+    if (choice === 'yes') {
+      goToStep(19);
+    } else if (choice === 'no') {
+      goToStep(2);
+    } else {
+      // no selection yet → do nothing (wait for user)
+    }
+    return;
+  }
+
+  // On step 19 decide whether to ask for specific precious stone (step 20) or skip to origin (step 21)
+  if (currentStep === 19) {
+    const gemAround = document.querySelector('input[name="gem_around"]:checked')?.value;
+    if (gemAround === "אבן-חן") {
+      goToStep(20);
+    } else if (gemAround === "יהלום") {
+      goToStep(21);
+    } else {
+      // default: wait for selection
+    }
+    return;
+  }
+
+  // Avancer dans the normal linear flow for remaining steps
+  if ((currentStep >= 1 && currentStep <= 10) || (currentStep >= 14 && currentStep <= 23)) {
     goToStep(currentStep + 1);
     // document.getElementById("user-summary").style.display = "block";
     // updateUserSummary();
@@ -429,7 +603,7 @@ function resetStepInputs() {
   // Réinitialiser l'état du carousel
   const selectedImages = document.querySelectorAll('.img_carousel.selected');
   selectedImages.forEach(img => img.classList.remove("selected"));
-  document.getElementById('selected-name').textContent = "Aucune création sélectionnée";
+  document.getElementById('selected-name').innerHTML = '<div style="text-align:center"><span style="color:#666;display:block;margin-bottom:6px">לא נבחרו יצירות</span><span style="font-weight:700;font-size:1.05rem;color:#111;display:block">&nbsp;</span></div>';
   document.getElementById('confirmImageBtn').style.display = "none";
 }
 
@@ -458,7 +632,7 @@ images_carousel.forEach(img => {
 
     // const name = img.dataset.name;
     // localStorage.setItem("selectedCreation", name);
-    selectedName.textContent = `Création sélectionnée : ${our_creation}`;
+    selectedName.innerHTML = `<div style="text-align:center"><span style="color:#666;display:block;margin-bottom:6px">יצירה נבחרת</span><span style="font-weight:700;font-size:1.05rem;color:#111;display:block">${our_creation}</span></div>`;
     document.getElementById('confirmImageBtn').style.display = "inline-block";
   });
 });
@@ -528,62 +702,66 @@ function submitForm(e) {
   data.append("phone", document.querySelector('input[name="phone"]')?.value || "");
   data.append("comment", document.querySelector('textarea[name="comment"]')?.value || "");
 
-  // Type de bijou
-  data.append("jewel", document.querySelector('input[name="jewel"]:checked')?.value || "");
-  data.append("gem", document.querySelector('input[name="gem"]:checked')?.value || "");
-  data.append("layout", document.querySelector('input[name="layout"]:checked')?.value || "");
-  data.append("origin", document.querySelector('input[name="origin"]:checked')?.value || "");
+  // Type de bijou + basic metadata
+  const jewelValue = document.querySelector('input[name="jewel"]:checked')?.value || "";
+  data.append("jewel", jewelValue);
+
+  let gemValue = document.querySelector('input[name="gem"]:checked')?.value || "";
+  // gemValue may be chosen later in the around/central flow; we'll fallback later if empty
+  data.append("gem", gemValue);
+
+  const layoutValue = document.querySelector('input[name="layout"]:checked')?.value || "";
+  data.append("layout", layoutValue);
+
+  let originValue = document.querySelector('input[name="origin"]:checked')?.value || "";
+  data.append("origin", originValue);
+
   data.append("color", document.querySelector('input[name="jewel-color"]:checked')?.value || "");
   data.append("metal_carat", document.querySelector('input[name="metal-carat"]:checked')?.value || "");
 
-  // Champs "autre" pour la pierre précieuse
+  // Collect primary "other" inputs but postpone final append of stone/shape/carat
   let preciousStoneValue = document.querySelector('input[name="precious_stone"]:checked')?.value || "";
   if (preciousStoneValue === "אחר") {
     const preciousOtherInput = document.getElementById('precious_stone_other_input');
     preciousStoneValue = preciousOtherInput?.value.trim() || "אחר";
   }
-  data.append("stone_type", preciousStoneValue);
 
-  // Champs "autre" pour la forme
   let shapeValue = document.querySelector('input[name="shape"]:checked')?.value || "";
   if (shapeValue === "אחר") {
     const shapeOtherInput = document.getElementById('shape_other_input');
     shapeValue = shapeOtherInput?.value.trim() || "אחר";
   }
-  data.append("shape", shapeValue);
 
-  // Champs "autre" pour le carat
   let caratValue = document.querySelector('input[name="carat"]:checked')?.value || "";
-  if (caratValue === "autre" || caratValue === "אחר") { // J'ai inclus "אחר" au cas où
+  if (caratValue === "autre" || caratValue === "אחר") {
     const caratOtherInput = document.getElementById('carat_other_input');
     caratValue = caratOtherInput?.value.trim() || "autre";
   }
-  data.append("stone_carat", caratValue);
 
   // Champs pour la pierre central
-  data.append("gem_central", document.querySelector('input[name="gem_central"]:checked')?.value || "");
-  data.append("origin_central", document.querySelector('input[name="origin_central"]:checked')?.value || "");
+  // data.append("gem_central", document.querySelector('input[name="gem_central"]:checked')?.value || "");
+  // data.append("origin_central", document.querySelector('input[name="origin_central"]:checked')?.value || "");
 
-  let preciousStoneCentralValue = document.querySelector('input[name="precious_stone_central"]:checked')?.value || "";
-  if (preciousStoneCentralValue === "אחר") {
-      const preciousOtherInput = document.getElementById('precious_stone_other_input_central');
-      preciousStoneCentralValue = preciousOtherInput?.value.trim() || "אחר";
-  }
-  data.append("stone_type_central", preciousStoneCentralValue);
+  // let preciousStoneCentralValue = document.querySelector('input[name="precious_stone_central"]:checked')?.value || "";
+  // if (preciousStoneCentralValue === "אחר") {
+  //     const preciousOtherInput = document.getElementById('precious_stone_other_input_central');
+  //     preciousStoneCentralValue = preciousOtherInput?.value.trim() || "אחר";
+  // }
+  // data.append("stone_type_central", preciousStoneCentralValue);
 
-  let shapeCentralValue = document.querySelector('input[name="shape_central"]:checked')?.value || "";
-  if (shapeCentralValue === "אחר") {
-      const shapeOtherInput = document.getElementById('shape_other_input_central');
-      shapeCentralValue = shapeOtherInput?.value.trim() || "אחר";
-  }
-  data.append("shape_central", shapeCentralValue);
+  // let shapeCentralValue = document.querySelector('input[name="shape_central"]:checked')?.value || "";
+  // if (shapeCentralValue === "אחר") {
+  //     const shapeOtherInput = document.getElementById('shape_other_input_central');
+  //     shapeCentralValue = shapeOtherInput?.value.trim() || "אחר";
+  // }
+  // data.append("shape_central", shapeCentralValue);
 
-  let caratCentralValue = document.querySelector('input[name="carat_central"]:checked')?.value || "";
-  if (caratCentralValue === "autre" || caratCentralValue === "אחר") { // J'ai inclus "אחר" au cas où
-      const caratOtherInput = document.getElementById('carat_other_input_central');
-      caratCentralValue = caratOtherInput?.value.trim() || "autre";
-  }
-  data.append("stone_carat_central", caratCentralValue);
+  // let caratCentralValue = document.querySelector('input[name="carat_central"]:checked')?.value || "";
+  // if (caratCentralValue === "autre" || caratCentralValue === "אחר") { // J'ai inclus "אחר" au cas où
+  //     const caratOtherInput = document.getElementById('carat_other_input_central');
+  //     caratCentralValue = caratOtherInput?.value.trim() || "autre";
+  // }
+  // data.append("stone_carat_central", caratCentralValue);
 
   // Champs pour la pierre autour
   data.append("gem_around", document.querySelector('input[name="gem_around"]:checked')?.value || "");
@@ -609,6 +787,23 @@ function submitForm(e) {
       caratAroundValue = caratOtherInput?.value.trim() || "autre";
   }
   data.append("stone_carat_around", caratAroundValue);
+
+  // --- Finalize stone/shape/carat fields with sensible fallbacks ---
+  // if primary (step4) empty, prefer central (step15), then around (step20)
+  const finalStoneType = preciousStoneValue || preciousStoneCentralValue || preciousStoneAroundValue || "";
+  const finalShape = shapeValue || shapeCentralValue || shapeAroundValue || "";
+  const finalCarat = caratValue || caratCentralValue || caratAroundValue || "";
+
+  data.set("stone_type", finalStoneType);
+  data.set("shape", finalShape);
+  data.set("stone_carat", finalCarat);
+
+  // Finalize gem and origin with fallbacks (main -> around -> central)
+  const finalGem = gemValue || document.querySelector('input[name="gem_around"]:checked')?.value || document.querySelector('input[name="gem_central"]:checked')?.value || "";
+  data.set("gem", finalGem);
+
+  const finalOrigin = originValue || document.querySelector('input[name="origin_around"]:checked')?.value || document.querySelector('input[name="origin_central"]:checked')?.value || "";
+  data.set("origin", finalOrigin);
 
   // Champs "autre" pour les tailles (ring, bracelet, collier)
   let ringSizeValue = document.getElementById("ring-size")?.value || "";
@@ -638,7 +833,7 @@ function submitForm(e) {
 
 
   // --- Envoi du formulaire ---
-  fetch('https://script.google.com/macros/s/AKfycbwR_hiMi_2NFworplMp_m2idf7MIB6bfxWS-p6T4F_w8XdAMrdJTvGWTW48YfmVwFo/exec', {
+  fetch('https://script.google.com/macros/s/AKfycbyv9nxzRenDV8i8bhSax6sFhgz4Db6HkB0BEDnJ6AN9P8EUjjhfUbZ21z0mGy6qr-uA/exec', {
     method: 'POST',
     body: data,
     mode: "no-cors"
