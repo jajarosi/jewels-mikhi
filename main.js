@@ -11,10 +11,10 @@ let imagesPerPage = 8;
 
 function computeImagesPerPage() {
   const w = window.innerWidth;
-  if (w >= 1200) return 12;
-  if (w >= 900) return 9;
-  if (w >= 600) return 6;
-  return 4;
+  if (w >= 1200) return 16;
+  if (w >= 900) return 12;
+  if (w >= 600) return 9;
+  return 12; // show more small thumbnails on narrow screens
 }
 
 function showGalleryPage(page) {
