@@ -2,10 +2,64 @@ let currentStep = 0;
 let imgUrl = "";
 let our_creation = "";
 let stepHistory = ["step0"];
-const track = document.querySelector(".carousel-track");
-const images_carousel = track.querySelectorAll(".img_carousel");
+const galleryGrid = document.querySelector('.gallery-grid');
+let images_carousel = galleryGrid ? Array.from(galleryGrid.querySelectorAll('.img_carousel')) : [];
 const selectedName = document.getElementById("selected-name");
-let selectedJewel = ""; 
+let selectedJewel = "";
+let currentGalleryPage = 1;
+let imagesPerPage = 8;
+
+function computeImagesPerPage() {
+  const w = window.innerWidth;
+  if (w >= 1200) return 12;
+  if (w >= 900) return 9;
+  if (w >= 600) return 6;
+  return 4;
+}
+
+function showGalleryPage(page) {
+  imagesPerPage = computeImagesPerPage();
+  const total = images_carousel.length;
+  const totalPages = Math.max(1, Math.ceil(total / imagesPerPage));
+  if (page < 1) page = 1;
+  if (page > totalPages) page = totalPages;
+  currentGalleryPage = page;
+  const start = (page - 1) * imagesPerPage;
+  const end = start + imagesPerPage;
+  images_carousel.forEach((img, i) => {
+    img.style.display = (i >= start && i < end) ? 'block' : 'none';
+  });
+  const indicator = document.getElementById('pageIndicator');
+  if (indicator) indicator.textContent = `${page} / ${totalPages}`;
+}
+
+function initGalleryPagination() {
+  images_carousel = galleryGrid ? Array.from(galleryGrid.querySelectorAll('.img_carousel')) : [];
+  images_carousel.forEach(img => img.style.display = 'none');
+  showGalleryPage(1);
+
+  // attach click/dblclick handlers
+  images_carousel.forEach(img => {
+    img.addEventListener('dblclick', function () {
+      openImageModal(this.src);
+    });
+    img.addEventListener('click', () => {
+      images_carousel.forEach(i => i.classList.remove('selected'));
+      img.classList.add('selected');
+      our_creation = img.dataset.name;
+      selectedName.innerHTML = `<div style="text-align:center"><span style="color:#666;display:block;margin-bottom:6px">יצירה נבחרת</span><span style="font-weight:700;font-size:1.05rem;color:#111;display:block">${our_creation}</span></div>`;
+      const confirm = document.getElementById('confirmImageBtn');
+      if (confirm) confirm.style.display = 'inline-block';
+    });
+  });
+
+  const prev = document.getElementById('gridPrev');
+  const next = document.getElementById('gridNext');
+  if (prev) prev.onclick = () => showGalleryPage(currentGalleryPage - 1);
+  if (next) next.onclick = () => showGalleryPage(currentGalleryPage + 1);
+
+  window.addEventListener('resize', () => showGalleryPage(currentGalleryPage));
+}
 
 
 // --- Step 10: handle 'other' for ring-size, bracelet-size, collier-size ---
@@ -617,28 +671,10 @@ uploadcare.Widget('[role=uploadcare-uploader]').onUploadComplete(function(info) 
   document.getElementById('confirmBtn').style.display = "inline-block";
 });
 
-images_carousel.forEach(img => {
-  img.addEventListener('dblclick', function () {
-    openImageModal(this.src);
-    // console.log("Image double-cliquée");
-  });
-  img.addEventListener("click", () => {
-    // Retire la sélection des autres
-    images_carousel.forEach(i => i.classList.remove("selected"));
-    // Ajoute la classe sélectionnée
-    img.classList.add("selected");
-    // console.log("Image sélectionnée :", img.dataset.name);
-    our_creation = img.dataset.name;
+// image event listeners are attached inside initGalleryPagination()
 
-    // const name = img.dataset.name;
-    // localStorage.setItem("selectedCreation", name);
-    selectedName.innerHTML = `<div style="text-align:center"><span style="color:#666;display:block;margin-bottom:6px">יצירה נבחרת</span><span style="font-weight:700;font-size:1.05rem;color:#111;display:block">${our_creation}</span></div>`;
-    document.getElementById('confirmImageBtn').style.display = "inline-block";
-  });
-});
-
-document.querySelector(".prev").onclick = () => track.scrollBy({ left: -220, behavior: "smooth" });
-document.querySelector(".next").onclick = () => track.scrollBy({ left: 220, behavior: "smooth" });
+// initialize the new gallery pagination if present
+if (typeof initGalleryPagination === 'function') initGalleryPagination();
 
 document.getElementById('confirmImageBtn').addEventListener('click', function () {
   goToStep(11)
