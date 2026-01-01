@@ -833,7 +833,7 @@ function submitForm(e) {
 
 
   // --- Envoi du formulaire ---
-  fetch('https://script.google.com/macros/s/AKfycbyv9nxzRenDV8i8bhSax6sFhgz4Db6HkB0BEDnJ6AN9P8EUjjhfUbZ21z0mGy6qr-uA/exec', {
+  fetch('https://script.google.com/macros/s/AKfycbyzLIvu7pMx1dKNSg1fhcXsekVPdp_USeReVu0GFfk6uXdvFCEzGd-YoN1I_AMNQej-PQ/exec', {
     method: 'POST',
     body: data,
     mode: "no-cors"
