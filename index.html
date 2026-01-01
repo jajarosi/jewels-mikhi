@@ -1291,6 +1291,13 @@
       <p>&copy; 2023 Michael_Bloch. כל הזכויות שמורות.</p>
     </footer>
     <div id="imageModal" class="modal" onclick="closeImageModal(event)">
+      <button
+        class="modal-close"
+        onclick="event.stopPropagation(); closeModal();"
+        aria-label="Close image"
+      >
+        ✕
+      </button>
       <img id="modalImage" class="modal-content" />
     </div>
     <script>

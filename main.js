@@ -39,17 +39,25 @@ function initGalleryPagination() {
   showGalleryPage(1);
 
   // attach click/dblclick handlers
+  const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
   images_carousel.forEach(img => {
-    img.addEventListener('dblclick', function () {
-      openImageModal(this.src);
-    });
+    if (!isTouch) {
+      img.addEventListener('dblclick', function () {
+        openImageModal(this.src);
+      });
+    }
     img.addEventListener('click', () => {
+      const wasSelected = img.classList.contains('selected');
       images_carousel.forEach(i => i.classList.remove('selected'));
       img.classList.add('selected');
       our_creation = img.dataset.name;
       selectedName.innerHTML = `<div style="text-align:center"><span style="color:#666;display:block;margin-bottom:6px">יצירה נבחרת</span><span style="font-weight:700;font-size:1.05rem;color:#111;display:block">${our_creation}</span></div>`;
       const confirm = document.getElementById('confirmImageBtn');
       if (confirm) confirm.style.display = 'inline-block';
+      // On touch devices, open modal when tapping the already-selected image
+      if (isTouch && wasSelected) {
+        openImageModal(img.src);
+      }
     });
   });
 
@@ -697,6 +705,11 @@ function closeImageModal(event) {
   if (event.target.id === "imageModal") {
     document.getElementById("imageModal").style.display = "none";
   }
+}
+
+function closeModal() {
+  const m = document.getElementById('imageModal');
+  if (m) m.style.display = 'none';
 }
 
 document.addEventListener('DOMContentLoaded', (event) => {

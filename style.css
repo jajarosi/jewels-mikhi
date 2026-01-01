@@ -874,11 +874,40 @@ button:active {
 .modal-content {
     margin: auto;
     display: block;
-    max-width: 90%;
-    max-height: 90%;
+        max-width: 90%;
+        max-height: 90%;
     border-radius: 10px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
     animation: zoomIn 0.3s ease-out;
+}
+
+.modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 1010;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Make modal image fit better on small screens */
+@media(max-width: 720px) {
+    .modal-content {
+        width: calc(100% - 28px);
+        height: auto;
+        max-height: calc(100% - 80px);
+        margin-top: 40px;
+    }
+    .modal-close { top: 8px; right: 8px; width:36px; height:36px; }
 }
 
 /* Pied de page */
