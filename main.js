@@ -907,6 +907,53 @@ function submitForm(e) {
 
 }
 
+fetch("https://script.google.com/macros/s/AKfycbxyDtyBtgtQlt-EMWnSoA2cN9vUhfr92sWeXFUmmLnbxlTSWWNxzd-XvaNL2WOg2D2eDg/exec")
+  .then(res => res.json())
+  .then(creations => {
+    const container = document.querySelector(".gallery-grid");
+    if (!container) return;
+
+    // noms déjà présents dans le HTML
+    const existingNames = new Set(
+      Array.from(container.querySelectorAll(".img_carousel"))
+        .map(img => img.dataset.name)
+    );
+
+    creations.forEach(c => {
+      if (c.active !== "yes") return;
+      if (existingNames.has(c.name)) return;
+
+      const img = document.createElement("img");
+      img.src = c.image_url;
+      img.alt = c.name;
+      img.dataset.name = c.name;
+      img.className = "img_carousel";
+
+      container.appendChild(img);
+    });
+
+    // IMPORTANT : rebrancher tes listeners existants
+    if (typeof initGalleryPagination === "function") {
+      initGalleryPagination();
+    }
+  });
+
+
+
+  // .then(res => res.json())
+  // .then(data => {
+  //   console.log("CREATIONS:", data);
+  // })
+  // .catch(err => {
+  //   console.error("Erreur fetch:", err);
+  // });
+
+
+
+
+
+
+
 // function updateUserSummary() {
 //   document.getElementById("summary-jewel").textContent = document.querySelector('input[name="jewel"]:checked')?.value || "-";
 //   document.getElementById("summary-gem").textContent = document.querySelector('input[name="gem"]:checked')?.value || "-";

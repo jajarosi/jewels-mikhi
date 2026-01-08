@@ -803,7 +803,7 @@ button:active {
     transform: translateY(-50%) scale(1.05);
 }
 
-/* Gallery grid with pagination (replaces wide carousel for many images) */
+/* Gallery grid with pagination */
 .gallery {
     width: 100%;
 }
