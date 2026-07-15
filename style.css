@@ -867,8 +867,9 @@ button:active {
     color: #888;
 }
 
-/* Uploadcare uploader (step 12) */
-.uc-file-uploader-regular {
+/* Sélecteur d'image d'inspiration (step 12) */
+.pick-image-btn {
+    display: block;
     width: 100%;
     max-width: 400px;
     margin: 0 auto 1.5rem;
@@ -876,6 +877,31 @@ button:active {
     border-radius: 10px;
     padding: 20px;
     background-color: #fcfcfc;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.pick-image-btn:hover,
+.pick-image-btn:focus-visible {
+    background-color: #fff8e6;
+    border-color: #b8952e;
+}
+
+.image-preview-wrap {
+    max-width: 400px;
+    margin: 0 auto 1.5rem;
+}
+
+.image-preview {
+    display: block;
+    width: 100%;
+    max-height: 320px;
+    object-fit: contain;
+    border-radius: 10px;
+    background-color: #f4f4f4;
 }
 
 #uploadStatus {

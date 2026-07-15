@@ -7,15 +7,11 @@
     <!-- add my logo -->
     <link rel="icon" href="assets/icons/michael-bloch.webp" type="image/png" />
     <link rel="stylesheet" href="style.css" />
+    <!-- SDK Supabase servi en local : aucun CDN, donc insensible aux bloqueurs
+         de pub et au filtrage réseau. Build UMD officiel v2.110.5.
+         Mise à jour : voir assets/js/README.md -->
+    <script defer src="assets/js/supabase.js"></script>
     <script defer src="main.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@1/web/uc-file-uploader-regular.min.css"
-    />
-    <script>
-      UPLOADCARE_PUBLIC_KEY = "95cd37e8a2e2b723d5fe";
-    </script>
-    <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
   </head>
   <body>
     <!-- Full-width 3-column background strip (images cycle per column) -->
@@ -156,13 +152,21 @@
 
           <div class="step" id="step12">
             <h2>הוסף תמונה</h2>
+            <!-- accept="image/*" sans attribut capture : iOS propose alors au
+                 choix la photothèque, l'appareil photo ou un fichier — ce que
+                 faisait l'onglet "file camera" du widget. -->
             <input
-              type="hidden"
-              role="uploadcare-uploader"
-              data-clearable
-              data-tabs="file camera"
-              id="uploadcareInput"
+              type="file"
+              id="inspirationInput"
+              accept="image/*"
+              hidden
             />
+            <button type="button" id="pickImageBtn" class="pick-image-btn">
+              בחר תמונה
+            </button>
+            <div id="imagePreviewWrap" class="image-preview-wrap" hidden>
+              <img id="imagePreview" class="image-preview" alt="" />
+            </div>
             <p id="uploadStatus">📎 אין קובץ שנשלח</p>
             <button id="confirmBtn" style="display: none; margin-top: 10px">
               אשר את התמונה

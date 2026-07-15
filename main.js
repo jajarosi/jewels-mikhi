@@ -1,6 +1,12 @@
+// --- État global du parcours -------------------------------------------------
+// Ces déclarations restent en tête, au top-level, et rien au-dessus d'elles ne
+// doit pouvoir lever : une exception plus haut avorterait le corps du script et
+// les laisserait en zone morte (TDZ), ce qui fige toute la navigation.
 let currentStep = 0;
+let selectedPath = "";
 let imgUrl = "";
 let our_creation = "";
+let our_creation_id = null;
 let stepHistory = ["step0"];
 const galleryGrid = document.querySelector('.gallery-grid');
 let images_carousel = galleryGrid ? Array.from(galleryGrid.querySelectorAll('.img_carousel')) : [];
@@ -8,6 +14,59 @@ const selectedName = document.getElementById("selected-name");
 let selectedJewel = "";
 let currentGalleryPage = 1;
 let imagesPerPage = 8;
+
+// --- Supabase ----------------------------------------------------------------
+// La clé "anon" est publique par conception : c'est la RLS qui protège les
+// données. Ne jamais mettre la clé "service_role" ici.
+const SUPABASE_URL = "https://byyfxmdjqoxncjziubne.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5eWZ4bWRqcW94bmNqeml1Ym5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwOTgxMjYsImV4cCI6MjA5OTY3NDEyNn0.I2KGgR1g4U6S6d0UZUMoEJF2oLpt28VDRVEY6y3mEDQ";
+
+let supabaseClient = null;
+
+// Le HTML envoie value="model" ; la colonne `path` attend 'collection'.
+const PATH_MAP = { custom: "custom", upload: "upload", model: "collection" };
+
+// --- Photo d'inspiration (parcours 'upload') ---------------------------------
+const INSPIRATION_BUCKET = "inspirations";
+const MAX_IMAGE_DIM = 1600; // px sur le plus grand côté
+const UPLOAD_IDLE_TEXT = "📎 אין קובץ שנשלח";
+
+// Par ordre de préférence : le WebP pèse ~30 % de moins que le JPEG à qualité
+// égale. Mais un navigateur qui ne sait pas encoder le type demandé renvoie du
+// PNG sans prévenir — et un PNG de photo est plus lourd que le JPEG d'origine.
+// On vérifie donc le type réellement produit et on retombe sur le JPEG.
+const IMAGE_FORMATS = [
+  { type: "image/webp", ext: "webp", quality: 0.8 },
+  { type: "image/jpeg", ext: "jpg", quality: 0.82 },
+];
+
+// Init paresseuse. Le SDK arrive par CDN : il peut manquer (réseau coupé,
+// bloqueur de pub, CDN injoignable). On ne l'exige donc qu'au moment où on s'en
+// sert réellement, et jamais au chargement du script.
+function getSupabase() {
+  if (supabaseClient) return supabaseClient;
+  try {
+    if (!window.supabase || typeof window.supabase.createClient !== "function") {
+      console.error(
+        "[Supabase] SDK indisponible : assets/js/supabase.js n'a pas été chargé."
+      );
+      return null;
+    }
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: false }, // le formulaire public n'a pas de session
+    });
+    return supabaseClient;
+  } catch (err) {
+    console.error("[Supabase] Initialisation impossible :", err);
+    return null;
+  }
+}
+
+// "" → null : Postgres préfère NULL à la chaîne vide.
+function nn(value) {
+  const v = (value ?? "").toString().trim();
+  return v === "" ? null : v;
+}
 
 function computeImagesPerPage() {
   const w = window.innerWidth;
@@ -51,6 +110,7 @@ function initGalleryPagination() {
       images_carousel.forEach(i => i.classList.remove('selected'));
       img.classList.add('selected');
       our_creation = img.dataset.name;
+      our_creation_id = img.dataset.id ? Number(img.dataset.id) : null;
       selectedName.innerHTML = `<div style="text-align:center"><span style="color:#666;display:block;margin-bottom:6px">יצירה נבחרת</span><span style="font-weight:700;font-size:1.05rem;color:#111;display:block">${our_creation}</span></div>`;
       const confirm = document.getElementById('confirmImageBtn');
       if (confirm) confirm.style.display = 'inline-block';
@@ -367,6 +427,7 @@ function nextStep() {
   if (currentStep === 0) {
     const choice = document.querySelector('input[name="personalised"]:checked')?.value;
     resetStepInputs();
+    selectedPath = PATH_MAP[choice] || "";
     if (choice === "custom") {
       goToStep(1);
     } else if (choice === "upload") {
@@ -557,13 +618,13 @@ function resetStepInputs() {
   // --- NOUVEAUTÉ : Réinitialisation des variables d'image et des éléments d'UI associés ---
   imgUrl = "";
   our_creation = "";
-  
-  // Réinitialiser l'état du champ d'upload Care
-  const uploadcareInput = document.getElementById('uploadcareInput');
-  if (uploadcareInput && uploadcareInput.widget) {
-    uploadcareInput.widget.value(null);
-  }
-  document.getElementById('uploadStatus').textContent = "📎 Aucun fichier envoyé";
+  our_creation_id = null;
+
+  // Réinitialiser l'état de l'upload d'inspiration
+  const inspirationInput = document.getElementById('inspirationInput');
+  if (inspirationInput) inspirationInput.value = "";
+  clearImagePreview();
+  setUploadStatus(UPLOAD_IDLE_TEXT);
   document.getElementById('confirmBtn').style.display = "none";
 
   // Réinitialiser l'état du carousel
@@ -573,15 +634,139 @@ function resetStepInputs() {
   document.getElementById('confirmImageBtn').style.display = "none";
 }
 
-uploadcare.Widget('[role=uploadcare-uploader]').onUploadComplete(function(info) {
-  const imagUrl = info.cdnUrl; // <- L'URL finale de l’image uploadée
-  console.log("Image URL:", imagUrl);
-  imgUrl = imagUrl; 
+// --- Parcours 'upload' : photo d'inspiration ---------------------------------
 
-  document.getElementById('uploadStatus').textContent = "✅ Image envoyée !";
-        
-  document.getElementById('confirmBtn').style.display = "inline-block";
-});
+function setUploadStatus(text) {
+  const el = document.getElementById("uploadStatus");
+  if (el) el.textContent = text;
+}
+
+function showImagePreview(blob) {
+  const wrap = document.getElementById("imagePreviewWrap");
+  const img = document.getElementById("imagePreview");
+  if (!wrap || !img) return;
+  if (img.src.startsWith("blob:")) URL.revokeObjectURL(img.src);
+  img.src = URL.createObjectURL(blob);
+  wrap.hidden = false;
+}
+
+function clearImagePreview() {
+  const wrap = document.getElementById("imagePreviewWrap");
+  const img = document.getElementById("imagePreview");
+  if (img && img.src.startsWith("blob:")) URL.revokeObjectURL(img.src);
+  if (img) img.removeAttribute("src");
+  if (wrap) wrap.hidden = true;
+}
+
+function randomId() {
+  if (window.crypto && typeof window.crypto.randomUUID === "function") {
+    return window.crypto.randomUUID();
+  }
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+}
+
+// Redimensionne et recompresse dans le navigateur avant l'envoi : une photo
+// d'iPhone de 4 Mo part à ~200 Ko. C'est ce qui remplace les transformations
+// CDN payantes — et c'est plus rapide, puisqu'on n'envoie jamais les 4 Mo.
+async function downscaleImage(file) {
+  if (!file.type.startsWith("image/")) {
+    throw new Error("le fichier n'est pas une image");
+  }
+
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((resolve, reject) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error("format d'image non reconnu"));
+      el.src = objectUrl;
+    });
+
+    const largest = Math.max(img.naturalWidth, img.naturalHeight);
+    const scale = Math.min(1, MAX_IMAGE_DIM / largest);
+    const w = Math.max(1, Math.round(img.naturalWidth * scale));
+    const h = Math.max(1, Math.round(img.naturalHeight * scale));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    // Les navigateurs récents appliquent l'orientation EXIF au <img> avant le
+    // dessin : une photo prise en portrait sur iPhone ne se retrouve pas couchée.
+    canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+
+    return await encodeCanvas(canvas);
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
+// WebP si le navigateur sait l'encoder, JPEG sinon. Le contrôle sur blob.type
+// est ce qui évite le repli silencieux en PNG.
+async function encodeCanvas(canvas) {
+  for (const fmt of IMAGE_FORMATS) {
+    const blob = await new Promise(resolve =>
+      canvas.toBlob(resolve, fmt.type, fmt.quality)
+    );
+    if (blob && blob.type === fmt.type) return { blob, ext: fmt.ext };
+  }
+  throw new Error("compression impossible");
+}
+
+// Pousse le blob dans Supabase Storage et renvoie l'URL publique.
+async function uploadInspiration(blob, ext) {
+  const sb = getSupabase();
+  if (!sb) throw new Error("SDK Supabase indisponible");
+
+  const path = `${randomId()}.${ext}`;
+  const { error } = await sb.storage.from(INSPIRATION_BUCKET).upload(path, blob, {
+    contentType: blob.type,
+    cacheControl: "31536000", // les fichiers sont immuables : nom unique par upload
+    upsert: false,
+  });
+  if (error) throw error;
+
+  const { data } = sb.storage.from(INSPIRATION_BUCKET).getPublicUrl(path);
+  if (!data || !data.publicUrl) throw new Error("URL publique introuvable");
+  return data.publicUrl;
+}
+
+const inspirationInput = document.getElementById("inspirationInput");
+const pickImageBtn = document.getElementById("pickImageBtn");
+
+if (inspirationInput && pickImageBtn) {
+  pickImageBtn.addEventListener("click", () => inspirationInput.click());
+
+  inspirationInput.addEventListener("change", async () => {
+    const file = inspirationInput.files && inspirationInput.files[0];
+    if (!file) return;
+
+    const confirmBtn = document.getElementById("confirmBtn");
+    // On repart de zéro à chaque choix : sinon une 2e image qui échoue
+    // laisserait l'URL de la 1re en place et le client enverrait la mauvaise.
+    imgUrl = "";
+    if (confirmBtn) confirmBtn.style.display = "none";
+
+    try {
+      setUploadStatus("⏳ מכינים את התמונה…");
+      const { blob, ext } = await downscaleImage(file);
+      showImagePreview(blob);
+      console.log(
+        `[Upload] ${(file.size / 1024).toFixed(0)} Ko → ${(blob.size / 1024).toFixed(0)} Ko (${ext})`
+      );
+
+      setUploadStatus("⏳ מעלים את התמונה…");
+      imgUrl = await uploadInspiration(blob, ext);
+
+      setUploadStatus("✅ התמונה נשלחה!");
+      if (confirmBtn) confirmBtn.style.display = "inline-block";
+    } catch (err) {
+      console.error("[Upload] échec :", err);
+      imgUrl = "";
+      clearImagePreview();
+      setUploadStatus("❌ העלאת התמונה נכשלה. אנא נסו שוב.");
+    }
+  });
+}
 
 // image event listeners are attached inside initGalleryPagination()
 
@@ -629,7 +814,66 @@ document.addEventListener('DOMContentLoaded', (event) => {
 });
 
 
-function submitForm(e) {
+// Résout un choix "אחר" en la valeur libre saisie par le client.
+function resolveOther(radioName, otherInputId, otherValues = ["אחר"]) {
+  const picked = document.querySelector(`input[name="${radioName}"]:checked`)?.value || "";
+  if (!otherValues.includes(picked)) return picked;
+  return document.getElementById(otherInputId)?.value.trim() || picked;
+}
+
+// Résout une taille dont l'option "other" ouvre un champ libre.
+function resolveSize(selectId, otherInputId) {
+  const picked = document.getElementById(selectId)?.value || "";
+  if (picked !== "other") return picked;
+  return document.getElementById(otherInputId)?.value.trim() || "other";
+}
+
+// Construit les colonnes propres au parcours 'custom'.
+function buildCustomPayload() {
+  const stoneType = resolveOther("precious_stone", "precious_stone_other_input");
+  const shape = resolveOther("shape", "shape_other_input");
+  const carat = resolveOther("carat", "carat_other_input", ["אחר", "autre"]);
+
+  const stoneTypeAround = resolveOther("precious_stone_around", "precious_stone_other_input_around");
+  const shapeAround = resolveOther("shape_around", "shape_other_input_around");
+  const caratAround = resolveOther("carat_around", "carat_other_input_around", ["אחר", "autre"]);
+
+  const gem = document.querySelector('input[name="gem"]:checked')?.value || "";
+  const origin = document.querySelector('input[name="origin"]:checked')?.value || "";
+  const gemAround = document.querySelector('input[name="gem_around"]:checked')?.value || "";
+  const originAround = document.querySelector('input[name="origin_around"]:checked')?.value || "";
+
+  // Le client qui choisit le halo renseigne les pierres "autour" avant la
+  // pierre centrale : si le central est vide, on retombe sur l'autour.
+  const halo = document.querySelector('input[name="choice-around"]:checked')?.value;
+
+  return {
+    jewel: nn(document.querySelector('input[name="jewel"]:checked')?.value),
+    jewel_color: nn(document.querySelector('input[name="jewel-color"]:checked')?.value),
+    metal_carat: nn(document.querySelector('input[name="metal-carat"]:checked')?.value),
+    layout: nn(document.querySelector('input[name="layout"]:checked')?.value),
+
+    gem: nn(gem || gemAround),
+    stone_type: nn(stoneType || stoneTypeAround),
+    origin: nn(origin || originAround),
+    shape: nn(shape || shapeAround),
+    stone_carat: nn(carat || caratAround),
+
+    has_halo: halo ? halo === "yes" : null,
+    gem_around: nn(gemAround),
+    stone_type_around: nn(stoneTypeAround),
+    origin_around: nn(originAround),
+    shape_around: nn(shapeAround),
+    stone_carat_around: nn(caratAround),
+
+    ring_size: nn(resolveSize("ring-size", "ring-size-other")),
+    bracelet_size: nn(resolveSize("bracelet-size", "bracelet-size-other")),
+    collier_size: nn(resolveSize("collier-size", "collier-size-other")),
+    boucles_type: nn(document.getElementById("boucles-type")?.value),
+  };
+}
+
+async function submitForm(e) {
   e.preventDefault();
 
   const submitBtn = document.getElementById('submitBtn');
@@ -637,182 +881,135 @@ function submitForm(e) {
   const finalForm = document.getElementById('finalForm');
   const successMessage = document.getElementById('message');
 
-  if (loadingMessage) {
-    loadingMessage.classList.remove('hidden');
+  // Le parcours est mémorisé au step 0 ; on relit le DOM en secours.
+  const rawPath =
+    selectedPath ||
+    PATH_MAP[document.querySelector('input[name="personalised"]:checked')?.value] ||
+    "";
+
+  if (!rawPath) {
+    showTemporaryNotice("אירעה שגיאה: לא נבחר מסלול. אנא רעננו את הדף.", 6000);
+    return;
   }
 
-  if (submitBtn) {
-    submitBtn.style.display = 'none';
+  const payload = {
+    path: rawPath,
+    client_name: nn(document.querySelector('input[name="name"]')?.value),
+    client_email: nn(document.querySelector('input[name="email"]')?.value),
+    client_phone: nn(document.querySelector('input[name="phone"]')?.value),
+    comment: nn(document.querySelector('textarea[name="comment"]')?.value),
+  };
+
+  if (rawPath === "custom") {
+    Object.assign(payload, buildCustomPayload());
+  } else if (rawPath === "upload") {
+    payload.inspiration_img_url = nn(imgUrl);
+  } else if (rawPath === "collection") {
+    payload.creation_name = nn(our_creation);
+    payload.creation_id = our_creation_id;
   }
 
-  const data = new URLSearchParams();
-
-  // --- Collecte des données avec gestion des champs "autre" ---
-
-  // Données de contact
-  data.append("name", document.querySelector('input[name="name"]')?.value || "");
-  data.append("email", document.querySelector('input[name="email"]')?.value || "");
-  data.append("phone", document.querySelector('input[name="phone"]')?.value || "");
-  data.append("comment", document.querySelector('textarea[name="comment"]')?.value || "");
-
-  // Type de bijou + basic metadata
-  const jewelValue = document.querySelector('input[name="jewel"]:checked')?.value || "";
-  data.append("jewel", jewelValue);
-
-  let gemValue = document.querySelector('input[name="gem"]:checked')?.value || "";
-  // gemValue may be chosen later in the around/central flow; we'll fallback later if empty
-  data.append("gem", gemValue);
-
-  const layoutValue = document.querySelector('input[name="layout"]:checked')?.value || "";
-  data.append("layout", layoutValue);
-
-  let originValue = document.querySelector('input[name="origin"]:checked')?.value || "";
-  data.append("origin", originValue);
-
-  data.append("color", document.querySelector('input[name="jewel-color"]:checked')?.value || "");
-  data.append("metal_carat", document.querySelector('input[name="metal-carat"]:checked')?.value || "");
-
-  // Collect primary "other" inputs but postpone final append of stone/shape/carat
-  let preciousStoneValue = document.querySelector('input[name="precious_stone"]:checked')?.value || "";
-  if (preciousStoneValue === "אחר") {
-    const preciousOtherInput = document.getElementById('precious_stone_other_input');
-    preciousStoneValue = preciousOtherInput?.value.trim() || "אחר";
+  // On double la contrainte CHECK côté client pour afficher un message lisible
+  // plutôt que de laisser remonter une erreur Postgres brute.
+  if (rawPath === "upload" && !payload.inspiration_img_url) {
+    showTemporaryNotice("לא נמצאה תמונה. אנא העלו תמונה ונסו שוב.", 6000);
+    return;
+  }
+  if (rawPath === "collection" && !payload.creation_name) {
+    showTemporaryNotice("לא נבחרה יצירה. אנא בחרו דגם ונסו שוב.", 6000);
+    return;
   }
 
-  let shapeValue = document.querySelector('input[name="shape"]:checked')?.value || "";
-  if (shapeValue === "אחר") {
-    const shapeOtherInput = document.getElementById('shape_other_input');
-    shapeValue = shapeOtherInput?.value.trim() || "אחר";
+  // On ne réclame le client qu'ici : si le SDK manque, le client garde son
+  // formulaire rempli et peut réessayer, au lieu de perdre sa saisie.
+  const sb = getSupabase();
+  if (!sb) {
+    showTemporaryNotice("החיבור לשרת נכשל. אנא בדקו את החיבור לאינטרנט ונסו שוב.", 6000);
+    return;
   }
 
-  let caratValue = document.querySelector('input[name="carat"]:checked')?.value || "";
-  if (caratValue === "autre" || caratValue === "אחר") {
-    const caratOtherInput = document.getElementById('carat_other_input');
-    caratValue = caratOtherInput?.value.trim() || "autre";
+  if (loadingMessage) loadingMessage.classList.remove('hidden');
+  if (submitBtn) submitBtn.style.display = 'none';
+
+  let error = null;
+  try {
+    ({ error } = await sb.from('submissions').insert(payload));
+  } catch (err) {
+    error = err; // panne réseau : le SDK rejette au lieu de renvoyer { error }
   }
 
-  // Champs pour la pierre autour
-  data.append("gem_around", document.querySelector('input[name="gem_around"]:checked')?.value || "");
-  data.append("origin_around", document.querySelector('input[name="origin_around"]:checked')?.value || "");
-
-  let preciousStoneAroundValue = document.querySelector('input[name="precious_stone_around"]:checked')?.value || "";
-  if (preciousStoneAroundValue === "אחר") {
-      const preciousOtherInput = document.getElementById('precious_stone_other_input_around');
-      preciousStoneAroundValue = preciousOtherInput?.value.trim() || "אחר";
+  if (error) {
+    console.error('Supabase insert error:', error);
+    finalForm.style.display = 'flex';
+    if (submitBtn) submitBtn.style.display = 'block';
+    if (loadingMessage) loadingMessage.classList.add('hidden');
+    showTemporaryNotice("השליחה נכשלה. אנא נסו שוב.", 6000);
+    return;
   }
-  data.append("stone_type_around", preciousStoneAroundValue);
 
-  let shapeAroundValue = document.querySelector('input[name="shape_around"]:checked')?.value || "";
-  if (shapeAroundValue === "אחר") {
-      const shapeOtherInput = document.getElementById('shape_other_input_around');
-      shapeAroundValue = shapeOtherInput?.value.trim() || "אחר";
-  }
-  data.append("shape_around", shapeAroundValue);
-
-  let caratAroundValue = document.querySelector('input[name="carat_around"]:checked')?.value || "";
-  if (caratAroundValue === "autre" || caratAroundValue === "אחר") { // J'ai inclus "אחר" au cas où
-      const caratOtherInput = document.getElementById('carat_other_input_around');
-      caratAroundValue = caratOtherInput?.value.trim() || "autre";
-  }
-  data.append("stone_carat_around", caratAroundValue);
-
-  // --- Finalize stone/shape/carat fields with sensible fallbacks ---
-  // if primary (step4) empty, prefer central (step15), then around (step20)
-  const finalStoneType = preciousStoneValue || preciousStoneAroundValue || "";
-  const finalShape = shapeValue || shapeAroundValue || "";
-  const finalCarat = caratValue || caratAroundValue || "";
-
-  data.set("stone_type", finalStoneType);
-  data.set("shape", finalShape);
-  data.set("stone_carat", finalCarat);
-
-  // Finalize gem and origin with fallbacks (main -> around -> central)
-  const finalGem = gemValue || document.querySelector('input[name="gem_around"]:checked')?.value || document.querySelector('input[name="gem_central"]:checked')?.value || "";
-  data.set("gem", finalGem);
-
-  const finalOrigin = originValue || document.querySelector('input[name="origin_around"]:checked')?.value || document.querySelector('input[name="origin_central"]:checked')?.value || "";
-  data.set("origin", finalOrigin);
-
-  // Champs "autre" pour les tailles (ring, bracelet, collier)
-  let ringSizeValue = document.getElementById("ring-size")?.value || "";
-  if (ringSizeValue === "other") {
-    ringSizeValue = document.getElementById("ring-size-other")?.value.trim() || "other";
-  }
-  data.append("ring_size", ringSizeValue);
-
-  let braceletSizeValue = document.getElementById("bracelet-size")?.value || "";
-  if (braceletSizeValue === "other") {
-    braceletSizeValue = document.getElementById("bracelet-size-other")?.value.trim() || "other";
-  }
-  data.append("bracelet_size", braceletSizeValue);
-
-  let collierSizeValue = document.getElementById("collier-size")?.value || "";
-  if (collierSizeValue === "other") {
-    collierSizeValue = document.getElementById("collier-size-other")?.value.trim() || "other";
-  }
-  data.append("collier_size", collierSizeValue);
-  
-  // Type de boucle d'oreille
-  data.append("boucles_size", document.getElementById("boucles-type")?.value || "");
-
-  // Gestion des images
-  data.append("image", imgUrl || "");
-  data.append("creations", our_creation || "");
-
-
-  // --- Envoi du formulaire ---
-  fetch('https://script.google.com/macros/s/AKfycbyzLIvu7pMx1dKNSg1fhcXsekVPdp_USeReVu0GFfk6uXdvFCEzGd-YoN1I_AMNQej-PQ/exec', {
-    method: 'POST',
-    body: data,
-    mode: "no-cors"
-  }).then(() => {
-    finalForm.classList.remove('active');
-    successMessage.classList.remove('hidden');
-    if (loadingMessage) {
-        loadingMessage.classList.add('hidden');
-    }
-    setTimeout(() => {
-      window.location.reload();
-    }, 2000);
-  }).catch(() => {
-    finalForm.style.display = 'flex'
-    if (submitBtn) {
-        submitBtn.style.display = 'block';
-    }
-    if (loadingMessage) {
-        loadingMessage.classList.add('hidden');
-    }
-  });
-
+  finalForm.classList.remove('active');
+  successMessage.classList.remove('hidden');
+  if (loadingMessage) loadingMessage.classList.add('hidden');
+  setTimeout(() => {
+    window.location.reload();
+  }, 2000);
 }
 
-fetch("https://script.google.com/macros/s/AKfycbxyDtyBtgtQlt-EMWnSoA2cN9vUhfr92sWeXFUmmLnbxlTSWWNxzd-XvaNL2WOg2D2eDg/exec")
-  .then(res => res.json())
-  .then(creations => {
-    const container = document.querySelector(".gallery-grid");
-    if (!container) return;
+// Enrichit la galerie avec le catalogue Supabase. Purement additif : en cas de
+// panne (SDK absent, réseau, RLS), on sort sans rien casser et l'étape 13
+// continue d'afficher les images codées en dur dans index.html.
+async function loadCreations() {
+  const container = document.querySelector(".gallery-grid");
+  if (!container) return;
 
-    // noms déjà présents dans le HTML
-    const existingNames = new Set(
-      Array.from(container.querySelectorAll(".img_carousel"))
-        .map(img => img.dataset.name)
-    );
+  const sb = getSupabase();
+  if (!sb) return;
 
-    creations.forEach(c => {
-      if (c.active !== "yes") return;
-      if (existingNames.has(c.name)) return;
+  let creations = null;
+  try {
+    // `active` est déjà filtré par la RLS, mais on le garde explicite ici :
+    // la policy peut évoluer, la requête reste juste.
+    const { data, error } = await sb
+      .from("creations")
+      .select("id, name, img_url")
+      .eq("active", true)
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: true });
 
-      const img = document.createElement("img");
-      img.src = c.image_url;
-      img.alt = c.name;
-      img.dataset.name = c.name;
-      img.className = "img_carousel";
+    if (error) throw error;
+    creations = data;
+  } catch (err) {
+    console.error("[Supabase] Catalogue indisponible :", err);
+    return;
+  }
 
-      container.appendChild(img);
-    });
+  if (!Array.isArray(creations) || creations.length === 0) return;
 
-    // IMPORTANT : rebrancher tes listeners existants
-    if (typeof initGalleryPagination === "function") {
-      initGalleryPagination();
-    }
+  // noms déjà présents dans le HTML
+  const existingNames = new Set(
+    Array.from(container.querySelectorAll(".img_carousel"))
+      .map(img => img.dataset.name)
+  );
+
+  let added = 0;
+  creations.forEach(c => {
+    if (!c.img_url || !c.name) return;
+    if (existingNames.has(c.name)) return;
+
+    const img = document.createElement("img");
+    img.src = c.img_url;
+    img.alt = c.name;
+    img.dataset.name = c.name;
+    img.dataset.id = c.id;
+    img.className = "img_carousel";
+
+    container.appendChild(img);
+    added++;
   });
+
+  // IMPORTANT : rebrancher tes listeners existants — mais seulement si on a
+  // ajouté quelque chose, sinon on redouble les listeners déjà en place.
+  if (added > 0) initGalleryPagination();
+}
+
+loadCreations();
