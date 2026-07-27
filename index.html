@@ -168,6 +168,24 @@
               <img id="imagePreview" class="image-preview" alt="" />
             </div>
             <p id="uploadStatus">📎 אין קובץ שנשלח</p>
+
+            <!-- Catégorie du bijou souhaité : détermine l'étape "taille" ensuite -->
+            <div id="uploadCategoryWrap" class="category-choices" hidden>
+              <p class="category-prompt">איזה תכשיט תרצו?</p>
+              <label class="category-chip"
+                ><input type="radio" name="upload_category" value="ring" />טבעת</label
+              >
+              <label class="category-chip"
+                ><input type="radio" name="upload_category" value="bracelet" />צמיד</label
+              >
+              <label class="category-chip"
+                ><input type="radio" name="upload_category" value="necklace" />שרשרת</label
+              >
+              <label class="category-chip"
+                ><input type="radio" name="upload_category" value="earrings" />עגילים</label
+              >
+            </div>
+
             <button id="confirmBtn" style="display: none; margin-top: 10px">
               אשר את התמונה
             </button>
@@ -188,139 +206,161 @@
             >
               🔍 לחצו פעמיים על התמונה כדי להגדיל אותה
             </div>
+            <div class="category-choices category-filter" id="galleryFilter">
+              <button type="button" class="category-chip" data-cat="" aria-pressed="true">הכול</button>
+              <button type="button" class="category-chip" data-cat="ring" aria-pressed="false">טבעת</button>
+              <button type="button" class="category-chip" data-cat="bracelet" aria-pressed="false">צמיד</button>
+              <button type="button" class="category-chip" data-cat="necklace" aria-pressed="false">שרשרת</button>
+              <button type="button" class="category-chip" data-cat="earrings" aria-pressed="false">עגילים</button>
+            </div>
             <div class="gallery">
               <div class="gallery-grid">
-                <img
-                  class="img_carousel"
-                  src="./assets/creations/quatre-b-b-ecrain.webp"
-                  alt="סט כחול- סוד הספיר"
-                  data-name="סט כחול- סוד הספיר"
-                />
                 <img
                   class="img_carousel"
                   src="./assets/creations/bague-entoure.webp"
                   alt="שושנת אמרלד"
                   data-name="שושנת אמרלד"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/quatre-b-bl-ecrain.webp"
                   alt="רוח שמיים"
                   data-name="רוח שמיים"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/quatre-b-r-ecrain.webp"
                   alt="לב זהב"
                   data-name="לב זהב"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/un-an-or-main.webp"
                   alt="עלים של זהב"
                   data-name="עלים של זהב"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/une-b-b-main.webp"
                   alt="עין הספיר"
                   data-name="עין הספיר"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/une-b-bl-maion.webp"
                   alt="כוכב הצפון"
                   data-name="כוכב הצפון"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/une-b-main.webp"
                   alt="כתר המלכה"
                   data-name="כתר המלכה"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/chant.webp"
                   alt="שירת הלבנה"
                   data-name="שירת הלבנה"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/coeur.webp"
                   alt="הלב המלכותי"
                   data-name="הלב המלכותי"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/lumiere.webp"
                   alt="אור אינסופי"
                   data-name="אור אינסופי"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/vert.webp"
                   alt="טיפה של ירוק"
                   data-name="טיפה של ירוק"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/reve.webp"
                   alt="חלום ורוד"
                   data-name="חלום ורוד"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/vague.webp"
                   alt="גלי זהב"
                   data-name="גלי זהב"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/chance.webp"
                   alt="טיפה של מזל"
                   data-name="טיפה של מזל"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/carre-lumiere.webp"
                   alt="ריבוע אור"
                   data-name="ריבוע אור"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/amour-victoir.webp"
                   alt="אהבה ניצחון"
                   data-name="אהבה הנצח"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/etoile-minuit.webp"
                   alt="כוכבה חצות"
                   data-name="כוכבה חצות"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/קווים עדינים.webp"
                   alt="קווים עדינים"
                   data-name="קווים עדינים"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/טבעת חן נצחי.webp"
                   alt="טבעת חן נצחי"
                   data-name="טבעת חן נצחי"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/טבעת קלאסיקה.webp"
                   alt="טבעת קלאסיקה"
                   data-name="טבעת קלאסיקה"
+                  data-category="ring"
                 />
                 <img
                   class="img_carousel"
                   src="./assets/creations/הצילות הלילה.webp"
                   alt="הצילות הלילה"
                   data-name="הצילות הלילה"
+                  data-category="ring"
                 />
               </div>
               <div class="pagination">
@@ -1288,7 +1328,10 @@
               <button id="submitBtn" type="submit">שלח</button>
               <div id="loadingMessage" class="hidden">... שליחה מתבצעת ...</div>
             </form>
-            <div id="message" class="hidden">✅ תודה ! הבחירות שלך נשמרו.</div>
+            <div id="message" class="hidden">
+              <span class="success-title">בקשתכם נקלטה בהצלחה 💎</span>
+              <span class="success-sub">נציג מהצוות שלנו יצור אתכם קשר בהקדם</span>
+            </div>
           </div>
 
           <div class="navigation-buttons">

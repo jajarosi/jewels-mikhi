@@ -904,6 +904,77 @@ button:active {
     background-color: #f4f4f4;
 }
 
+/* Choix / filtre de catégorie (step 12 upload, step 13 galerie) */
+.category-choices {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin: 0 auto 1.2rem;
+    max-width: 460px;
+}
+
+.category-prompt {
+    flex-basis: 100%;
+    text-align: center;
+    margin: 0 0 4px;
+    font-weight: 600;
+    color: #555;
+}
+
+.category-chip {
+    display: inline-block;
+    padding: 9px 18px;
+    border: 1.5px solid #d4af37;
+    border-radius: 999px;
+    background: #fff;
+    color: #333;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    user-select: none;
+}
+
+.category-chip:hover {
+    background: #fff8e6;
+}
+
+/* Le <input radio> interne est masqué : c'est la puce qui porte l'état */
+.category-chip input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* État sélectionné : radio coché (step 12) ou aria-pressed (filtre step 13) */
+.category-chip:has(input[type="radio"]:checked),
+.category-filter .category-chip[aria-pressed="true"] {
+    background: #d4af37;
+    color: #fff;
+    border-color: #d4af37;
+}
+
+.category-filter {
+    margin-top: 6px;
+}
+
+/* Message de confirmation final */
+#message .success-title {
+    display: block;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #b8952e;
+    margin-bottom: 8px;
+}
+
+#message .success-sub {
+    display: block;
+    font-size: 1.05rem;
+    color: #555;
+}
+
 #uploadStatus {
     font-size: 1.1rem;
     color: #555;

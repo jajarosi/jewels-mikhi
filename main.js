@@ -14,6 +14,7 @@ const selectedName = document.getElementById("selected-name");
 let selectedJewel = "";
 let currentGalleryPage = 1;
 let imagesPerPage = 8;
+let activeCategory = ""; // filtre de catégorie actif dans la galerie (step 13)
 
 // --- Supabase ----------------------------------------------------------------
 // La clé "anon" est publique par conception : c'est la RLS qui protège les
@@ -25,6 +26,17 @@ let supabaseClient = null;
 
 // Le HTML envoie value="model" ; la colonne `path` attend 'collection'.
 const PATH_MAP = { custom: "custom", upload: "upload", model: "collection" };
+
+// Catégorie : slug neutre en base (creations.category), hébreu à l'affichage.
+// Le slug est aussi converti en valeur hébraïque pour selectedJewel, afin que
+// l'étape "taille" (step 10) et submissions.jewel restent cohérents avec le
+// parcours custom (qui utilise déjà l'hébreu).
+const CATEGORY_HE = {
+  ring: "טבעת",
+  bracelet: "צמיד",
+  necklace: "שרשרת",
+  earrings: "עגילים",
+};
 
 // --- Photo d'inspiration (parcours 'upload') ---------------------------------
 const INSPIRATION_BUCKET = "inspirations";
@@ -111,6 +123,10 @@ function initGalleryPagination() {
       img.classList.add('selected');
       our_creation = img.dataset.name;
       our_creation_id = img.dataset.id ? Number(img.dataset.id) : null;
+      // La catégorie (slug) de l'image pilote l'étape "taille" (step 10).
+      if (img.dataset.category) {
+        selectedJewel = CATEGORY_HE[img.dataset.category] || img.dataset.category;
+      }
       selectedName.innerHTML = `<div style="text-align:center"><span style="color:#666;display:block;margin-bottom:6px">יצירה נבחרת</span><span style="font-weight:700;font-size:1.05rem;color:#111;display:block">${our_creation}</span></div>`;
       const confirm = document.getElementById('confirmImageBtn');
       if (confirm) confirm.style.display = 'inline-block';
@@ -127,6 +143,36 @@ function initGalleryPagination() {
   if (next) next.onclick = () => showGalleryPage(currentGalleryPage + 1);
 
   window.addEventListener('resize', () => showGalleryPage(currentGalleryPage));
+
+  // Réappliquer le filtre courant : loadCreations() peut rappeler cette
+  // fonction après avoir injecté des images du catalogue.
+  setupGalleryFilter();
+  if (activeCategory) filterGallery(activeCategory);
+}
+
+// Filtre la galerie (step 13) par catégorie et repagine le sous-ensemble.
+function filterGallery(cat) {
+  activeCategory = cat || "";
+  const all = galleryGrid ? Array.from(galleryGrid.querySelectorAll('.img_carousel')) : [];
+  images_carousel = activeCategory
+    ? all.filter(img => (img.dataset.category || "") === activeCategory)
+    : all;
+  all.forEach(img => { img.style.display = 'none'; });
+  showGalleryPage(1);
+
+  document.querySelectorAll('#galleryFilter .category-chip').forEach(btn => {
+    btn.setAttribute('aria-pressed', String((btn.dataset.cat || "") === activeCategory));
+  });
+}
+
+// Branche les boutons de filtre une seule fois (idempotent via data-wired).
+function setupGalleryFilter() {
+  const bar = document.getElementById('galleryFilter');
+  if (!bar || bar.dataset.wired) return;
+  bar.dataset.wired = "1";
+  bar.querySelectorAll('.category-chip').forEach(btn => {
+    btn.addEventListener('click', () => filterGallery(btn.dataset.cat || ""));
+  });
 }
 
 
@@ -619,6 +665,7 @@ function resetStepInputs() {
   imgUrl = "";
   our_creation = "";
   our_creation_id = null;
+  selectedJewel = ""; // la catégorie est re-choisie à chaque parcours
 
   // Réinitialiser l'état de l'upload d'inspiration
   const inspirationInput = document.getElementById('inspirationInput');
@@ -626,12 +673,17 @@ function resetStepInputs() {
   clearImagePreview();
   setUploadStatus(UPLOAD_IDLE_TEXT);
   document.getElementById('confirmBtn').style.display = "none";
+  // Réinitialiser le choix de catégorie de l'upload (step 12)
+  document.querySelectorAll('input[name="upload_category"]').forEach(r => { r.checked = false; });
+  const uploadCatWrap = document.getElementById('uploadCategoryWrap');
+  if (uploadCatWrap) uploadCatWrap.hidden = true;
 
-  // Réinitialiser l'état du carousel
+  // Réinitialiser l'état du carousel + le filtre de catégorie (step 13)
   const selectedImages = document.querySelectorAll('.img_carousel.selected');
   selectedImages.forEach(img => img.classList.remove("selected"));
   document.getElementById('selected-name').innerHTML = '<div style="text-align:center"><span style="color:#666;display:block;margin-bottom:6px">לא נבחרו יצירות</span><span style="font-weight:700;font-size:1.05rem;color:#111;display:block">&nbsp;</span></div>';
   document.getElementById('confirmImageBtn').style.display = "none";
+  if (typeof filterGallery === "function") filterGallery("");
 }
 
 // --- Parcours 'upload' : photo d'inspiration ---------------------------------
@@ -758,11 +810,17 @@ if (inspirationInput && pickImageBtn) {
       imgUrl = await uploadInspiration(blob, ext);
 
       setUploadStatus("✅ התמונה נשלחה!");
+      // On révèle le choix de catégorie : il faut la photo ET la catégorie
+      // avant de pouvoir confirmer.
+      const catWrap = document.getElementById("uploadCategoryWrap");
+      if (catWrap) catWrap.hidden = false;
       if (confirmBtn) confirmBtn.style.display = "inline-block";
     } catch (err) {
       console.error("[Upload] échec :", err);
       imgUrl = "";
       clearImagePreview();
+      const catWrap = document.getElementById("uploadCategoryWrap");
+      if (catWrap) catWrap.hidden = true;
       setUploadStatus("❌ העלאת התמונה נכשלה. אנא נסו שוב.");
     }
   });
@@ -773,11 +831,21 @@ if (inspirationInput && pickImageBtn) {
 // initialize the new gallery pagination if present
 if (typeof initGalleryPagination === 'function') initGalleryPagination();
 
+// Collection : la catégorie (selectedJewel) est déjà posée au clic sur l'image.
+// On enchaîne sur couleur → type d'or → taille (step 8→9→10) puis contact.
 document.getElementById('confirmImageBtn').addEventListener('click', function () {
-  goToStep(11)
+  goToStep(8);
 });
+
+// Upload : on exige une catégorie avant d'avancer, puis même enchaînement.
 document.getElementById('confirmBtn').addEventListener('click', function () {
-  goToStep(11)
+  const cat = document.querySelector('input[name="upload_category"]:checked')?.value;
+  if (!cat) {
+    showTemporaryNotice("אנא בחרו סוג תכשיט (טבעת, צמיד, שרשרת או עגילים).", 5000);
+    return;
+  }
+  selectedJewel = CATEGORY_HE[cat] || cat; // slug → hébreu pour l'étape taille
+  goToStep(8);
 });
 
 updateNavigationButtons();
@@ -828,6 +896,19 @@ function resolveSize(selectId, otherInputId) {
   return document.getElementById(otherInputId)?.value.trim() || "other";
 }
 
+// Couleur, type d'or et tailles : étapes 8-9-10, communes aux 3 parcours.
+// (La bonne taille est remplie selon selectedJewel ; les autres restent null.)
+function buildColorMetalSize() {
+  return {
+    jewel_color: nn(document.querySelector('input[name="jewel-color"]:checked')?.value),
+    metal_carat: nn(document.querySelector('input[name="metal-carat"]:checked')?.value),
+    ring_size: nn(resolveSize("ring-size", "ring-size-other")),
+    bracelet_size: nn(resolveSize("bracelet-size", "bracelet-size-other")),
+    collier_size: nn(resolveSize("collier-size", "collier-size-other")),
+    boucles_type: nn(document.getElementById("boucles-type")?.value),
+  };
+}
+
 // Construit les colonnes propres au parcours 'custom'.
 function buildCustomPayload() {
   const stoneType = resolveOther("precious_stone", "precious_stone_other_input");
@@ -849,8 +930,6 @@ function buildCustomPayload() {
 
   return {
     jewel: nn(document.querySelector('input[name="jewel"]:checked')?.value),
-    jewel_color: nn(document.querySelector('input[name="jewel-color"]:checked')?.value),
-    metal_carat: nn(document.querySelector('input[name="metal-carat"]:checked')?.value),
     layout: nn(document.querySelector('input[name="layout"]:checked')?.value),
 
     gem: nn(gem || gemAround),
@@ -866,10 +945,7 @@ function buildCustomPayload() {
     shape_around: nn(shapeAround),
     stone_carat_around: nn(caratAround),
 
-    ring_size: nn(resolveSize("ring-size", "ring-size-other")),
-    bracelet_size: nn(resolveSize("bracelet-size", "bracelet-size-other")),
-    collier_size: nn(resolveSize("collier-size", "collier-size-other")),
-    boucles_type: nn(document.getElementById("boucles-type")?.value),
+    ...buildColorMetalSize(),
   };
 }
 
@@ -904,9 +980,13 @@ async function submitForm(e) {
     Object.assign(payload, buildCustomPayload());
   } else if (rawPath === "upload") {
     payload.inspiration_img_url = nn(imgUrl);
+    payload.jewel = nn(selectedJewel); // catégorie choisie au step 12
+    Object.assign(payload, buildColorMetalSize());
   } else if (rawPath === "collection") {
     payload.creation_name = nn(our_creation);
     payload.creation_id = our_creation_id;
+    payload.jewel = nn(selectedJewel); // catégorie de l'image choisie
+    Object.assign(payload, buildColorMetalSize());
   }
 
   // On double la contrainte CHECK côté client pour afficher un message lisible
@@ -971,7 +1051,7 @@ async function loadCreations() {
     // la policy peut évoluer, la requête reste juste.
     const { data, error } = await sb
       .from("creations")
-      .select("id, name, img_url")
+      .select("id, name, img_url, category")
       .eq("active", true)
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true });
@@ -1001,6 +1081,7 @@ async function loadCreations() {
     img.alt = c.name;
     img.dataset.name = c.name;
     img.dataset.id = c.id;
+    if (c.category) img.dataset.category = c.category;
     img.className = "img_carousel";
 
     container.appendChild(img);
