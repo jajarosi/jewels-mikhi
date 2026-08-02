@@ -41,7 +41,7 @@ const CATEGORY_HE = {
 // --- Photo d'inspiration (parcours 'upload') ---------------------------------
 const INSPIRATION_BUCKET = "inspirations";
 const MAX_IMAGE_DIM = 1600; // px sur le plus grand côté
-const UPLOAD_IDLE_TEXT = "📎 אין קובץ שנשלח";
+const UPLOAD_IDLE_TEXT = "אין קובץ שנשלח";
 
 // Par ordre de préférence : le WebP pèse ~30 % de moins que le JPEG à qualité
 // égale. Mais un navigateur qui ne sait pas encoder le type demandé renvoie du
@@ -351,9 +351,45 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!radio) return;
     const stone = radio.value;
     const infoText = label.querySelector('.stone-info-text');
-    if (infoText && stoneInfo[stone]) {
-      infoText.textContent = stoneInfo[stone];
+    if (!infoText || !stoneInfo[stone]) return;
+
+    infoText.textContent = stoneInfo[stone];
+
+    // La carte est un <label> : tout clic à l'intérieur coche le radio. Pour
+    // que « lire la description » ne vaille pas « choisir cette pierre », le
+    // bouton d'info et le dos de la carte annulent l'activation du label
+    // (preventDefault) avant de piloter le retournement.
+    const infoBtn = document.createElement('button');
+    infoBtn.type = 'button';
+    infoBtn.className = 'stone-info-btn';
+    infoBtn.textContent = 'i';
+    infoBtn.setAttribute('aria-label', `מידע על ${stone}`);
+    infoBtn.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      const willOpen = !label.classList.contains('is-flipped');
+      // Une seule carte ouverte à la fois : sur mobile on ne voit qu'une
+      // rangée, deux dos ouverts en même temps n'aident personne.
+      document.querySelectorAll('.stone-flip.is-flipped').forEach(other => {
+        other.classList.remove('is-flipped');
+      });
+      label.classList.toggle('is-flipped', willOpen);
+    });
+
+    const back = label.querySelector('.flip-back');
+    if (back) {
+      const close = document.createElement('span');
+      close.className = 'flip-back__close';
+      close.textContent = 'סגירה';
+      back.appendChild(close);
+      back.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        label.classList.remove('is-flipped');
+      });
     }
+
+    label.querySelector('.flip-front')?.prepend(infoBtn);
   });
 });
 
@@ -439,14 +475,105 @@ function updateStep10Options() {
   }
 }
 
+// --- Routage du parcours -----------------------------------------------------
+// Étapes fusionnées :
+//   step4  = pierre centrale  (type + forme + carat)   ← ex. 4 + 6 + 7
+//   step20 = pierres du halo  (type + forme + carat)   ← ex. 20 + 22 + 23
+//   step8  = or               (couleur + titrage)      ← ex. 8 + 9
+// Les <input name="..."> n'ont pas bougé : seul le wrapper d'étape change,
+// donc buildCustomPayload()/buildColorMetalSize() lisent exactement pareil.
+
+// Étapes à question unique : un clic sur le radio enchaîne tout seul.
+// Les étapes fusionnées en sont exclues, sinon on sauterait leurs autres
+// sections dès la première réponse.
+const AUTO_ADVANCE_STEPS = new Set([0, 1, 2, 5, 18, 19, 21]);
+
+// Étapes qui portent leur propre bouton d'action (envoi / confirmation).
+const STEPS_WITHOUT_NEXT = new Set([11, 12, 13]);
+
+// Sections conditionnelles des étapes fusionnées : le choix "yes/no" d'une
+// étape amont décide de leur affichage.
+const CONDITIONAL_STONE_SECTIONS = {
+  4: { gem: "gem", stone: "precious_stone", group: "centralStoneGroup", other: "precious_stone_other_input" },
+  20: { gem: "gem_around", stone: "precious_stone_around", group: "aroundStoneGroup", other: "precious_stone_other_input_around" },
+};
+
+function checkedValue(name) {
+  return document.querySelector(`input[name="${name}"]:checked`)?.value || "";
+}
+
+// Étape suivante dans le parcours. Renvoie null quand il manque encore un
+// choix : nextStep() ne bouge alors pas, comme avant la fusion.
+function resolveNextStep() {
+  switch (currentStep) {
+    case 1:
+      return 18;
+    case 18: {
+      const halo = checkedValue("choice-around");
+      if (halo === "yes") return 19;
+      if (halo === "no") return 2;
+      return null;
+    }
+    // Le halo passe toujours par l'étape fusionnée 20 : même sans pierre de
+    // couleur (יהלום), il faut encore en choisir la forme et le carat.
+    case 19:
+      return checkedValue("gem_around") ? 20 : null;
+    case 20:
+      return 21;
+    case 21:
+      return 2;
+    case 2:
+      return checkedValue("gem") ? 4 : null;
+    case 4:
+      return 5;
+    case 5:
+      return 8;
+    case 8:
+      return 10;
+    case 10:
+      return 11;
+    default:
+      return null;
+  }
+}
+
+// Masque le groupe "type de pierre" quand le client a choisi le diamant, et
+// purge la sélection pour qu'une pierre choisie puis abandonnée ne parte pas
+// dans le payload.
+function updateStoneSections(stepNumber) {
+  const cfg = CONDITIONAL_STONE_SECTIONS[stepNumber];
+  if (!cfg) return;
+  const group = document.getElementById(cfg.group);
+  if (!group) return;
+
+  const needsStone = checkedValue(cfg.gem) === "אבן-חן";
+  group.hidden = !needsStone;
+  if (needsStone) return;
+
+  document.querySelectorAll(`input[name="${cfg.stone}"]`).forEach(radio => {
+    radio.checked = false;
+  });
+  const other = document.getElementById(cfg.other);
+  if (other) {
+    other.value = "";
+    other.style.display = "none";
+  }
+}
+
+// Tout ce qui doit être rafraîchi à l'entrée d'une étape, quel que soit le
+// sens de navigation (avant, arrière ou saut depuis le récapitulatif).
+function enterStep(stepNumber) {
+  if (stepNumber === 10) updateStep10Options();
+  updateStoneSections(stepNumber);
+  updateSummaryBar();
+}
+
 function goToStep(stepNumber) {
   currentStep = stepNumber;
   if (stepHistory[stepHistory.length - 1] !== "step" + stepNumber) {
     stepHistory.push("step" + stepNumber);
   }
-  if (stepNumber === 10) {
-    updateStep10Options();
-  }
+  enterStep(stepNumber);
   showStep("step" + stepNumber);
   focusContainer();
   updateNavigationButtons();
@@ -461,7 +588,9 @@ function updateNavigationButtons() {
 
   previousBtn.style.display = currentStep > 0 ? "inline-block" : "none";
   homeBtn.style.display = currentStep > 0 ? "inline-block" : "none";
-  nextBtn.style.display = (currentStep < 11) ? "inline-block" : "none";
+  // Les étapes 18-21 sont désormais au-dessus de 11 mais ont toujours besoin
+  // du bouton : on raisonne par exclusion plutôt que sur currentStep < 11.
+  nextBtn.style.display = STEPS_WITHOUT_NEXT.has(currentStep) ? "none" : "inline-block";
   finalForm.style.display = currentStep === 11 ? "block" : "none";
 }
 
@@ -470,8 +599,11 @@ function updateNavigationButtons() {
 function nextStep() {
   hideHeroSection();
   hideHTitle();
+
+  // Étape 0 : choix du parcours. C'est le seul aiguillage à trois branches.
   if (currentStep === 0) {
     const choice = document.querySelector('input[name="personalised"]:checked')?.value;
+    if (!choice) return;
     resetStepInputs();
     selectedPath = PATH_MAP[choice] || "";
     if (choice === "custom") {
@@ -484,90 +616,40 @@ function nextStep() {
     return;
   }
 
-  if (currentStep === 2) {
-    const gem = document.querySelector('input[name="gem"]:checked')?.value;
-    if (gem === "יהלום"){
-      goToStep(5);
-    } else if (gem === "אבן-חן") {
-      goToStep(4);
-    } else if (gem === "משולב") {
-      // Show combined step after step 3
-      goToStep(3);
-    }
-    return;
-  }
-
-  if (currentStep === 3) {
-    const layout = document.querySelector('input[name="layout"]:checked')?.value;
-    if (layout) {
-      goToStep(14);
-    }
-    return;
-  }
-
-  if (currentStep === 23) {
-    // If user chose Halo (yes) in step 18, proceed to central flow (step 2).
-    const aroundChoice = document.querySelector('input[name="choice-around"]:checked')?.value;
-    if (aroundChoice === 'yes') {
-      goToStep(2);
-      showTemporaryNotice('בחרתם קודם את האבנים מסביב — עכשיו חזרנו לבחור את האבן המרכזית', 5000);
-    } else {
-      goToStep(8);
-    }
-    return;
-  }
-
-  // Special flow: after choosing jewel (step 1) go to steps 18-23 flow
+  // Étape 1 : on mémorise le type de bijou, il pilote l'étape "taille".
   if (currentStep === 1) {
     const jewelChoice = document.querySelector('input[name="jewel"]:checked')?.value;
-    if (jewelChoice) selectedJewel = jewelChoice;
+    if (!jewelChoice) return;
+    selectedJewel = jewelChoice;
     goToStep(18);
     return;
   }
 
-  // If we're on the initial choice of combined layout (step 18) branch according to the user's choice
-  if (currentStep === 18) {
-    const choice = document.querySelector('input[name="choice-around"]:checked')?.value;
-    if (choice === 'yes') {
-      goToStep(19);
-    } else if (choice === 'no') {
-      goToStep(2);
-    } else {
-      // no selection yet → do nothing (wait for user)
-    }
-    return;
-  }
+  const target = resolveNextStep();
+  if (target === null) return; // choix manquant : on attend le client
 
-  // On step 19 decide whether to ask for specific precious stone (step 20) or skip to origin (step 21)
-  if (currentStep === 19) {
-    const gemAround = document.querySelector('input[name="gem_around"]:checked')?.value;
-    if (gemAround === "אבן-חן") {
-      goToStep(20);
-    } else if (gemAround === "יהלום") {
-      goToStep(21);
-    } else {
-      // default: wait for selection
-    }
-    return;
-  }
+  goToStep(target);
 
-  // Avancer dans the normal linear flow for remaining steps
-  if ((currentStep >= 1 && currentStep <= 10) || (currentStep >= 14 && currentStep <= 23)) {
-    goToStep(currentStep + 1);
-    // document.getElementById("user-summary").style.display = "block";
-    // updateUserSummary();
+  // Retour du halo vers la pierre centrale : on explique le va-et-vient.
+  if (currentStep === 2 && checkedValue("choice-around") === "yes") {
+    showTemporaryNotice(
+      "בחרתם קודם את האבנים מסביב — עכשיו חזרנו לבחור את האבן המרכזית",
+      5000
+    );
   }
-
 }
 
 function previousStep() {
   if (stepHistory.length > 1) {
-    stepHistory.pop(); 
+    stepHistory.pop();
     const previousStepId = stepHistory[stepHistory.length - 1];
     currentStep = parseInt(previousStepId.replace("step", ""));
+    // Même rafraîchissement qu'à l'aller : sections conditionnelles, options
+    // de taille et récapitulatif doivent refléter l'étape où l'on revient.
+    enterStep(currentStep);
     focusContainer();
     showStep(previousStepId);
-  } 
+  }
   updateNavigationButtons();
 }
 
@@ -583,82 +665,50 @@ function focusContainer(){
   }
 }
 
-// Auto-advance logic, but NOT for 'other' in steps 4, 6, 7
+// Enchaînement automatique — uniquement sur les étapes à question unique.
+// Sur une étape fusionnée, on fait défiler jusqu'à la section suivante au
+// lieu d'avancer, pour ne pas escamoter les questions restantes.
 document.querySelectorAll('.step[id^="step"] input[type="radio"]').forEach(input => {
   input.addEventListener('change', function() {
     const stepDiv = input.closest('.step');
     if (!stepDiv) return;
-    const stepId = stepDiv.id;
-    const stepNum = parseInt(stepId.replace('step', ''));
+    const stepNum = parseInt(stepDiv.id.replace('step', ''));
 
-    // Step 4: precious_stone
-    if (stepNum === 4 && input.id === 'precious_stone_other_radio') {
-      // Do not auto-advance, wait for input
-      return;
-    }
-    // Step 6: shape
-    if (stepNum === 6 && input.id === 'shape_other_radio') {
-      return;
-    }
-    // Step 7: carat
-    if (stepNum === 7 && input.id === 'carat_other_radio') {
-      return;
-    }
+    updateSummaryBar();
 
-    if (stepNum === 20 && input.id === 'precious_stone_other_radio_around') {
-      // Do not auto-advance, wait for input
-      return;
-    }
-
-    if (stepNum === 22 && input.id === 'shape_other_radio_around') {
-      return;
-    }
-
-    if (stepNum === 23 && input.id === 'carat_other_radio_around') {
-      return;
-    }
-
-    if (stepNum >= 0 && stepNum <= 10 || stepNum >= 14 && stepNum <= 23) {
+    if (AUTO_ADVANCE_STEPS.has(stepNum)) {
       nextStep();
+      return;
     }
+    scrollToNextGroup(input);
   });
 });
 
-// When user enters value for 'other', advance on Enter or blur if not empty
-function setupOtherInputAdvance(radioId, inputId, stepNum) {
-  const radio = document.getElementById(radioId);
-  const input = document.getElementById(inputId);
-  if (!radio || !input) return;
-  function tryAdvance() {
-    if (radio.checked && input.value.trim()) {
-      nextStep();
-    }
-  }
-  input.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      tryAdvance();
-    }
-  });
-  input.addEventListener('blur', function() {
-    tryAdvance();
-  });
+// Amène la question suivante de l'étape fusionnée sous les yeux du client.
+function scrollToNextGroup(input) {
+  const group = input.closest('.field-group');
+  const next = group && group.nextElementSibling;
+  if (!next || !next.classList.contains('field-group') || next.hidden) return;
+  next.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-setupOtherInputAdvance('precious_stone_other_radio', 'precious_stone_other_input', 4);
-setupOtherInputAdvance('shape_other_radio', 'shape_other_input', 6);
-setupOtherInputAdvance('carat_other_radio', 'carat_other_input', 7);
-setupOtherInputAdvance('precious_stone_other_radio_around', 'precious_stone_other_input_around', 20);
-setupOtherInputAdvance('shape_other_radio_around', 'shape_other_input_around', 22);
-setupOtherInputAdvance('carat_other_radio_around', 'carat_other_input_around', 23);
-
 function resetStepInputs() {
-  const radios = document.querySelectorAll(
-    '#step1 input[type="radio"], #step2 input[type="radio"], #step3 input[type="radio"], #step4 input[type="radio"], #step5 input[type="radio"], #step6 input[type="radio"], #step7 input[type="radio"], #step8 input[type="radio"], #step9 input[type="radio"], #step10 input[type="radio"], #step18 input[type="radio"], #step19 input[type="radio"], #step20 input[type="radio"], #step21 input[type="radio"], #step22 input[type="radio"], #step23 input[type="radio"]'
-  );
+  // Sélection par name : les wrappers d'étapes ont fusionné, les names non.
+  const RESET_NAMES = [
+    "jewel", "gem", "layout", "origin", "precious_stone", "shape", "carat",
+    "jewel-color", "metal-carat", "choice-around", "gem_around",
+    "origin_around", "precious_stone_around", "shape_around", "carat_around",
+  ];
+  RESET_NAMES.forEach(name => {
+    document.querySelectorAll(`input[name="${name}"]`).forEach(input => {
+      input.checked = false;
+    });
+  });
 
-  radios.forEach(input => {
-    input.checked = false;
+  // Champs libres "אחר" associés
+  document.querySelectorAll('input[id*="_other_input"], input[id$="-size-other"]').forEach(input => {
+    input.value = "";
+    input.style.display = "none";
   });
 
   // --- NOUVEAUTÉ : Réinitialisation des variables d'image et des éléments d'UI associés ---
@@ -684,7 +734,106 @@ function resetStepInputs() {
   document.getElementById('selected-name').innerHTML = '<div style="text-align:center"><span style="color:#666;display:block;margin-bottom:6px">לא נבחרו יצירות</span><span style="font-weight:700;font-size:1.05rem;color:#111;display:block">&nbsp;</span></div>';
   document.getElementById('confirmImageBtn').style.display = "none";
   if (typeof filterGallery === "function") filterGallery("");
+  updateSummaryBar();
 }
+
+// --- Récapitulatif persistant ------------------------------------------------
+// Construit uniquement à partir de l'état du formulaire : aucun champ ni
+// aucune colonne supplémentaire. Chaque jeton renvoie à l'étape qui l'a posé.
+
+// Ordre de lecture = ordre chronologique du parcours custom.
+const SUMMARY_FIELDS = [
+  { name: "jewel", step: 1 },
+  { name: "gem_around", step: 19, prefix: "מסביב: " },
+  { name: "precious_stone_around", step: 20, other: "precious_stone_other_input_around" },
+  { name: "shape_around", step: 20 },
+  { name: "carat_around", step: 20, other: "carat_other_input_around", suffix: " קראט" },
+  { name: "origin_around", step: 21 },
+  { name: "gem", step: 2 },
+  { name: "precious_stone", step: 4, other: "precious_stone_other_input" },
+  { name: "shape", step: 4, other: "shape_other_input" },
+  { name: "carat", step: 4, other: "carat_other_input", suffix: " קראט" },
+  { name: "origin", step: 5 },
+  { name: "jewel-color", step: 8 },
+  { name: "metal-carat", step: 8 },
+];
+
+const OTHER_VALUES = ["אחר", "autre"];
+
+// La taille dépend du type de bijou : on n'affiche que celle qui s'applique.
+function summarySizeToken() {
+  const byJewel = {
+    "טבעת": () => resolveSize("ring-size", "ring-size-other"),
+    "צמיד": () => resolveSize("bracelet-size", "bracelet-size-other"),
+    "שרשרת": () => resolveSize("collier-size", "collier-size-other"),
+    "עגילים": () => document.getElementById("boucles-type")?.value || "",
+  };
+  const read = byJewel[selectedJewel];
+  const value = read ? read() : "";
+  if (!value) return null;
+  const label = selectedJewel === "עגילים" ? value : `מידה ${value}`;
+  return { text: label, step: 10 };
+}
+
+function buildSummaryTokens() {
+  const tokens = [];
+
+  if (selectedPath === "collection" && our_creation) {
+    tokens.push({ text: our_creation, step: 13 });
+  }
+  if (selectedPath === "upload" && imgUrl) {
+    tokens.push({ text: "תמונה אישית", step: 12 });
+  }
+
+  SUMMARY_FIELDS.forEach(field => {
+    const value = field.other
+      ? resolveOther(field.name, field.other, OTHER_VALUES)
+      : checkedValue(field.name);
+    if (!value || OTHER_VALUES.includes(value)) return;
+    tokens.push({
+      text: (field.prefix || "") + value.replace(/-/g, " ") + (field.suffix || ""),
+      step: field.step,
+    });
+  });
+
+  const size = summarySizeToken();
+  if (size) tokens.push(size);
+
+  return tokens;
+}
+
+function updateSummaryBar() {
+  const bar = document.getElementById("summaryBar");
+  const list = document.getElementById("summaryTokens");
+  if (!bar || !list) return;
+
+  const tokens = buildSummaryTokens();
+  list.textContent = "";
+
+  tokens.forEach((token, i) => {
+    if (i > 0) {
+      const sep = document.createElement("span");
+      sep.className = "summary-bar__sep";
+      sep.textContent = "·";
+      list.appendChild(sep);
+    }
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "summary-token";
+    btn.textContent = token.text;
+    btn.setAttribute("aria-label", `לשינוי: ${token.text}`);
+    btn.addEventListener("click", () => goToStep(token.step));
+    list.appendChild(btn);
+  });
+
+  bar.hidden = tokens.length === 0 || currentStep === 0;
+}
+
+// Les <select> de taille (step 10) ne passent pas par le listener des radios.
+document.addEventListener("change", event => {
+  if (event.target.closest("#step10")) updateSummaryBar();
+});
+document.addEventListener("DOMContentLoaded", updateSummaryBar);
 
 // --- Parcours 'upload' : photo d'inspiration ---------------------------------
 
@@ -799,17 +948,17 @@ if (inspirationInput && pickImageBtn) {
     if (confirmBtn) confirmBtn.style.display = "none";
 
     try {
-      setUploadStatus("⏳ מכינים את התמונה…");
+      setUploadStatus("מכינים את התמונה…");
       const { blob, ext } = await downscaleImage(file);
       showImagePreview(blob);
       console.log(
         `[Upload] ${(file.size / 1024).toFixed(0)} Ko → ${(blob.size / 1024).toFixed(0)} Ko (${ext})`
       );
 
-      setUploadStatus("⏳ מעלים את התמונה…");
+      setUploadStatus("מעלים את התמונה…");
       imgUrl = await uploadInspiration(blob, ext);
 
-      setUploadStatus("✅ התמונה נשלחה!");
+      setUploadStatus("התמונה נשלחה");
       // On révèle le choix de catégorie : il faut la photo ET la catégorie
       // avant de pouvoir confirmer.
       const catWrap = document.getElementById("uploadCategoryWrap");
@@ -821,7 +970,7 @@ if (inspirationInput && pickImageBtn) {
       clearImagePreview();
       const catWrap = document.getElementById("uploadCategoryWrap");
       if (catWrap) catWrap.hidden = true;
-      setUploadStatus("❌ העלאת התמונה נכשלה. אנא נסו שוב.");
+      setUploadStatus("העלאת התמונה נכשלה. אנא נסו שוב.");
     }
   });
 }
@@ -832,7 +981,7 @@ if (inspirationInput && pickImageBtn) {
 if (typeof initGalleryPagination === 'function') initGalleryPagination();
 
 // Collection : la catégorie (selectedJewel) est déjà posée au clic sur l'image.
-// On enchaîne sur couleur → type d'or → taille (step 8→9→10) puis contact.
+// On enchaîne sur l'étape or fusionnée puis la taille (step 8 → 10), puis contact.
 document.getElementById('confirmImageBtn').addEventListener('click', function () {
   goToStep(8);
 });
@@ -869,16 +1018,38 @@ function closeModal() {
   if (m) m.style.display = 'none';
 }
 
-document.addEventListener('DOMContentLoaded', (event) => {
+// --- Musique d'ambiance : strictement opt-in ---------------------------------
+// Plus d'autoplay ni de piste muette qui démarre toute seule : rien ne joue
+// tant que le client n'a pas appuyé sur le bouton.
+document.addEventListener('DOMContentLoaded', () => {
   const audio = document.getElementById('background-audio');
-  audio.oncanplay = function() {
-      audio.volume = 0.005;
-      audio.muted = false;
-  };
-  if (audio.readyState >= 3) { 
-      audio.volume = 0.005;
-      audio.muted = false;
+  const toggle = document.getElementById('soundToggle');
+  const label = document.getElementById('soundToggleLabel');
+  if (!audio || !toggle) return;
+
+  audio.volume = 0.12;
+
+  function paint(on) {
+    toggle.setAttribute('aria-pressed', String(on));
+    toggle.classList.toggle('is-on', on);
+    if (label) label.textContent = on ? 'מוזיקה דולקת' : 'מוזיקה כבויה';
   }
+
+  toggle.addEventListener('click', () => {
+    if (audio.paused) {
+      // Le clic est un geste utilisateur : play() ne devrait pas être bloqué.
+      audio.play().then(() => paint(true)).catch(err => {
+        console.error('[Audio] lecture impossible :', err);
+        paint(false);
+      });
+    } else {
+      audio.pause();
+      paint(false);
+    }
+  });
+
+  audio.addEventListener('pause', () => paint(false));
+  paint(false);
 });
 
 
