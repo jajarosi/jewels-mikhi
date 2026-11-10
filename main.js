@@ -1206,9 +1206,9 @@ async function submitForm(e) {
   }, 2000);
 }
 
-// Enrichit la galerie avec le catalogue Supabase. Purement additif : en cas de
-// panne (SDK absent, réseau, RLS), on sort sans rien casser et l'étape 13
-// continue d'afficher les images codées en dur dans index.html.
+// Remplit la galerie (étape 13) avec le catalogue Supabase géré depuis le CRM.
+// Plus aucune image n'est codée en dur dans index.html : en cas de panne
+// (SDK absent, réseau, RLS), la galerie reste vide.
 async function loadCreations() {
   const container = document.querySelector(".gallery-grid");
   if (!container) return;
