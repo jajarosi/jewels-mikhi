@@ -279,6 +279,259 @@ body::before {
 }
 
 /* --------------------------------------------------------------------------
+   Pinat kodesh (paracha, horaires de Chabbat, phrase de moussar)
+   -------------------------------------------------------------------------- */
+
+.kadosh {
+  max-width: 760px;
+  width: 100%;
+  margin: -1rem 0 2.5rem;
+  background: var(--ivory);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--gold);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 1.25rem 1.5rem 1.35rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.kadosh-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.kadosh-title {
+  margin: 0;
+  font-size: 0.82rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+}
+
+.kadosh--shabbat .kadosh-title::after {
+  content: " · שבת שלום";
+}
+
+.kadosh-hdate {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.kadosh-parasha {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-head);
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.kadosh-times {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.kadosh-time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.6rem 0.5rem;
+  background: var(--gold-soft);
+  border-radius: var(--radius-sm);
+}
+
+.kadosh-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.kadosh-value {
+  font-family: var(--font-head);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+}
+
+.kadosh-city {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.kadosh-city select {
+  font: inherit;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  padding: 0.2rem 0.75rem;
+  /* 16px minimum : évite le zoom automatique d'iOS au focus */
+  font-size: 16px;
+}
+
+.kadosh--offline .kadosh-week {
+  display: none;
+}
+
+/* Vœux du jour (fêtes, Roch 'Hodech, 'Hanouka) */
+.kadosh-fest {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.kadosh-fest[hidden] {
+  display: none;
+}
+
+.kadosh-fest-item {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.1rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--gold);
+  border-radius: var(--radius-sm);
+  background: var(--gold-soft);
+}
+
+.kadosh-fest-item strong {
+  font-family: var(--font-head);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.kadosh-fest-item span {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* Site fermé pendant Chabbat / fête : le panneau remplace le formulaire */
+.shabbat-closed {
+  max-width: 760px;
+  width: 100%;
+  margin: 0 0 3rem;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  background: var(--ink);
+  color: var(--on-ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+}
+
+.shabbat-closed[hidden] {
+  display: none;
+}
+
+.shabbat-closed-kicker {
+  margin: 0 0 0.4rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+}
+
+.shabbat-closed-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.9rem;
+  color: var(--on-ink);
+}
+
+.shabbat-closed-text {
+  margin: 0 auto;
+  max-width: 420px;
+  font-size: 1rem;
+  color: var(--on-ink);
+  opacity: 0.85;
+}
+
+body.site-closed .form-container-wrapper {
+  display: none;
+}
+
+.kadosh-quote {
+  margin: 0;
+  padding: 0.9rem 0 0;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.kadosh-quote p {
+  margin: 0 0 0.3rem;
+  font-family: var(--font-head);
+  font-size: 1.12rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.kadosh-quote cite {
+  font-style: normal;
+  font-size: 0.8rem;
+  color: var(--gold);
+}
+
+/* Ordinateur : semaine à droite, phrase à gauche, côte à côte */
+@media (min-width: 760px) {
+  .kadosh {
+    grid-template-columns: 1.1fr 1fr;
+    grid-template-areas:
+      "head head"
+      "fest fest"
+      "week quote";
+    column-gap: 2rem;
+    padding: 1.4rem 2rem 1.6rem;
+  }
+  .kadosh-head { grid-area: head; }
+  .kadosh-fest { grid-area: fest; }
+  .kadosh-week { grid-area: week; }
+  .kadosh-quote {
+    grid-area: quote;
+    align-self: center;
+    padding: 0 2rem 0 0;
+    border-top: none;
+    border-inline-start: 1px solid var(--line);
+    text-align: start;
+  }
+  .kadosh--offline {
+    grid-template-columns: 1fr;
+    grid-template-areas: "head" "fest" "quote";
+  }
+  .kadosh--offline .kadosh-quote {
+    border-inline-start: none;
+    padding: 0;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .kadosh {
+    margin: -0.5rem 0 1.75rem;
+    padding: 1rem 1.1rem 1.1rem;
+    gap: 0.8rem;
+  }
+  .kadosh-parasha { font-size: 1.4rem; margin-bottom: 0.6rem; }
+  .kadosh-value { font-size: 1.2rem; }
+  .kadosh-quote p { font-size: 1.02rem; }
+  .shabbat-closed { padding: 2rem 1.25rem; margin-bottom: 2rem; }
+  .shabbat-closed-title { font-size: 1.55rem; }
+}
+
+/* --------------------------------------------------------------------------
    Conteneur du parcours
    -------------------------------------------------------------------------- */
 

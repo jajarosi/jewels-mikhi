@@ -50,6 +50,7 @@
          Mise à jour : voir assets/js/README.md -->
     <script defer src="assets/js/supabase.js"></script>
     <script defer src="main.js"></script>
+    <script defer src="kadosh.js"></script>
   </head>
   <body>
     <!-- Full-width 3-column background strip (images cycle per column) -->
@@ -173,6 +174,52 @@
           <p>*תודה שבחרתם בי ללוות את הרגעים היקרים באמת.*</p>
         </div>
       </div>
+      <!-- Pinat kodesh : paracha + horaires (API Hebcal, mis à jour chaque
+           semaine) et phrase de moussar du jour. Rempli par kadosh.js. -->
+      <section class="kadosh" id="kadosh" aria-labelledby="kadoshTitle">
+        <div class="kadosh-head">
+          <h2 id="kadoshTitle" class="kadosh-title">פינת קודש</h2>
+          <span class="kadosh-hdate" id="kadoshHdate"></span>
+        </div>
+        <div class="kadosh-fest" id="kadoshFest" hidden></div>
+        <div class="kadosh-week" id="kadoshWeek">
+          <p class="kadosh-parasha" id="kadoshParasha">&nbsp;</p>
+          <div class="kadosh-times">
+            <div class="kadosh-time">
+              <span class="kadosh-label">הדלקת נרות</span>
+              <span class="kadosh-value" id="kadoshCandles">--:--</span>
+            </div>
+            <div class="kadosh-time">
+              <span class="kadosh-label">צאת שבת</span>
+              <span class="kadosh-value" id="kadoshHavdalah">--:--</span>
+            </div>
+          </div>
+          <label class="kadosh-city">
+            <span>זמנים עבור</span>
+            <select id="kadoshCity" aria-label="עיר לזמני שבת">
+              <option value="281184">ירושלים</option>
+              <option value="293397">תל אביב</option>
+              <option value="294801">חיפה</option>
+              <option value="295530">באר שבע</option>
+              <option value="294071">נתניה</option>
+              <option value="295629">אשדוד</option>
+              <option value="293725">רחובות</option>
+              <option value="295548">בת ים</option>
+            </select>
+          </label>
+        </div>
+        <blockquote class="kadosh-quote" id="kadoshQuote">
+          <p id="kadoshQuoteText"></p>
+          <cite id="kadoshQuoteSrc"></cite>
+        </blockquote>
+      </section>
+      <!-- Affiché à la place du formulaire entre l'allumage et la havdala
+           (Chabbat et fêtes). Piloté par kadosh.js. -->
+      <section class="shabbat-closed" id="shabbatClosed" hidden aria-live="polite">
+        <p class="shabbat-closed-kicker" id="closedKicker">שבת שלום</p>
+        <h2 class="shabbat-closed-title" id="closedTitle">האתר שומר שבת</h2>
+        <p class="shabbat-closed-text" id="closedText"></p>
+      </section>
       <div class="form-container-wrapper">
         <div class="container">
           <h1>איך תרצו לעצב את התכשיט שלכם?</h1>
